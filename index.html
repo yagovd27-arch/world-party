@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#4A1222">
+<meta name="theme-color" content="#230810">
 <title>World Party</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
-  --wine-950:#2A0A13; --wine-900:#3A0E1B; --wine-800:#4A1222; --wine-700:#5C1A2B; --wine-600:#73253A; --wine-500:#8C3249;
+  --wine-950:#110308; --wine-900:#19050B; --wine-800:#230810; --wine-700:#310D18; --wine-600:#441424; --wine-500:#5A1C30;
   --cream:#F5EBDA; --cream-2:#E8D8BF; --cream-3:#CDB89A; --gold:#C9A46C; --gold-2:#E2C493;
   --line:rgba(245,235,218,.12); --muted:rgba(245,235,218,.66);
   --r-lg:22px; --r-md:16px; --r-sm:12px;
@@ -17,7 +17,7 @@
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;height:100%}
-body{background:#1B060C;color:var(--cream);font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+body{background:#0B0205;color:var(--cream);font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
 button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
 a{color:inherit;text-decoration:none}
 .serif{font-family:'Playfair Display',Georgia,serif}
@@ -27,7 +27,7 @@ p{margin:0}
 /* Phone shell */
 .shell{max-width:430px;min-height:100%;margin:0 auto;background:var(--wine-800);position:relative;overflow-x:hidden}
 @media (min-width:600px){
-  body{display:flex;align-items:center;justify-content:center;padding:24px;background:radial-gradient(circle at 30% 20%,#3a0e1b,#12040a 70%)}
+  body{display:flex;align-items:center;justify-content:center;padding:24px;background:radial-gradient(circle at 30% 20%,#240810,#070103 70%)}
   .shell{height:min(880px,calc(100vh - 48px));min-height:0;border-radius:44px;box-shadow:0 40px 120px rgba(0,0,0,.6),0 0 0 10px #0d0306,0 0 0 11px #2d0d16;overflow:hidden}
   .shell .scroll{height:100%;overflow-y:auto}
 }
@@ -40,7 +40,7 @@ p{margin:0}
 .ph{position:relative;overflow:hidden;background:linear-gradient(135deg,var(--wine-600),var(--wine-900))}
 .ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .6s ease,opacity .4s}
 .ph img.broken{display:none}
-.ph .shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(42,10,19,.05) 20%,rgba(42,10,19,.9) 100%)}
+.ph .shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(17,3,8,.05) 20%,rgba(17,3,8,.9) 100%)}
 
 /* Top bar */
 .top{padding:calc(18px + var(--safe-t)) 20px 6px;display:flex;align-items:center;justify-content:space-between;gap:12px}
@@ -48,7 +48,7 @@ p{margin:0}
 .logo i{font-style:italic;color:var(--gold-2)}
 .pill{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:rgba(245,235,218,.06);border-radius:999px;padding:8px 12px;font-size:13px;font-weight:600}
 .pill svg{width:15px;height:15px}
-.icon-btn{width:42px;height:42px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:rgba(42,10,19,.55);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--line)}
+.icon-btn{width:42px;height:42px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:rgba(17,3,8,.55);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--line)}
 .icon-btn svg{width:20px;height:20px}
 .icon-btn.on svg{fill:var(--gold-2);stroke:var(--gold-2)}
 
@@ -76,7 +76,7 @@ p{margin:0}
 .feat .meta h3{font-family:'Playfair Display',serif;font-size:24px;font-weight:700;line-height:1.1}
 .feat .meta .sub{font-size:13px;color:var(--cream-2)}
 .feat .row{display:flex;justify-content:space-between;align-items:center;margin-top:6px}
-.badge{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;border-radius:8px;padding:5px 8px;background:rgba(42,10,19,.6);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(245,235,218,.2)}
+.badge{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;border-radius:8px;padding:5px 8px;background:rgba(17,3,8,.6);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(245,235,218,.2)}
 .badge.gold{background:var(--gold);color:var(--wine-950);border-color:transparent}
 .badge.cream{background:var(--cream);color:var(--wine-900);border-color:transparent}
 .tl{position:absolute;top:14px;left:14px;display:flex;gap:6px}
@@ -92,6 +92,26 @@ p{margin:0}
 .city .lbl b{display:block;font-family:'Playfair Display',serif;font-size:20px;font-weight:700;line-height:1.1}
 .city .lbl span{font-size:12px;color:var(--cream-2)}
 .city .live{position:absolute;top:12px;left:12px}
+
+/* Calendar strip */
+.cal-head{display:flex;justify-content:space-between;align-items:center;padding:14px 20px 8px;font-size:12px;color:var(--muted);font-weight:500}
+.cal-head span:first-child{display:inline-flex;align-items:center;gap:6px;text-transform:capitalize}
+.cal-head svg{width:14px;height:14px;color:var(--gold)}
+.days{display:flex;gap:4px;overflow-x:auto;padding:0 20px 12px;border-bottom:1px solid var(--line)}
+.days::-webkit-scrollbar{display:none}
+.day{flex:0 0 44px;display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 0 6px;border-radius:14px;transition:background .2s,color .2s}
+.day small{font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);font-weight:600}
+.day b{font-size:16px;font-weight:700}
+.day i{width:4px;height:4px;border-radius:50%;background:var(--gold);opacity:0}
+.day.has i{opacity:1}
+.day.none b{color:var(--muted);font-weight:500}
+.day.on{background:var(--cream);color:var(--wine-900)}
+.day.on small,.day.on b{color:var(--wine-900)}
+.day.on i{background:var(--wine-700)}
+.day.all{flex:0 0 auto;align-self:center;height:38px;padding:0 14px;justify-content:center;font-size:13px;font-weight:700;border:1px solid var(--line);margin-right:4px}
+.day.all.on{border-color:var(--cream)}
+.ghead{padding:22px 20px 0;font-size:12px;letter-spacing:1.4px;text-transform:uppercase;font-weight:700;color:var(--gold-2)}
+.ghead + .list{padding-top:10px}
 
 /* Chips */
 .chips{display:flex;gap:8px;overflow-x:auto;padding:16px 20px 2px}
@@ -122,7 +142,7 @@ p{margin:0}
 
 /* Event detail */
 .ehero{height:380px}
-.ehero .shade{background:linear-gradient(180deg,rgba(42,10,19,.45) 0%,rgba(42,10,19,0) 30%,rgba(74,18,34,.4) 65%,var(--wine-800) 100%)}
+.ehero .shade{background:linear-gradient(180deg,rgba(17,3,8,.45) 0%,rgba(17,3,8,0) 30%,rgba(35,8,16,.4) 65%,var(--wine-800) 100%)}
 .edet{padding:0 20px;margin-top:-70px;position:relative}
 .edet h1{font-family:'Playfair Display',serif;font-size:34px;font-weight:800;line-height:1.05}
 .facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:18px}
@@ -157,7 +177,7 @@ p{margin:0}
 .ptsnote{display:flex;align-items:center;gap:8px;margin-top:14px;font-size:13px;color:var(--muted)}
 
 /* Sticky buy bar */
-.buybar{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:430px;padding:14px 20px calc(16px + var(--safe-b));background:rgba(42,10,19,.92);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px;z-index:20}
+.buybar{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:430px;padding:14px 20px calc(16px + var(--safe-b));background:rgba(17,3,8,.92);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px;z-index:20}
 @media (min-width:600px){.buybar,.nav{position:absolute}}
 .buybar .tot span{font-size:12px;color:var(--muted)}
 .buybar .tot b{display:block;font-family:'Playfair Display',serif;font-size:24px}
@@ -168,7 +188,7 @@ p{margin:0}
 .cta.gold{background:var(--gold);color:var(--wine-950)}
 
 /* Bottom nav */
-.nav{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:430px;display:flex;justify-content:space-around;padding:10px 8px calc(12px + var(--safe-b));background:rgba(42,10,19,.92);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid var(--line);z-index:20}
+.nav{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:430px;display:flex;justify-content:space-around;padding:10px 8px calc(12px + var(--safe-b));background:rgba(17,3,8,.92);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid var(--line);z-index:20}
 .nav a{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11px;font-weight:600;color:var(--muted);padding:4px 10px;position:relative}
 .nav a svg{width:22px;height:22px}
 .nav a.on{color:var(--cream)}
@@ -408,34 +428,36 @@ function miniRow(e, sub, href){
 function nav(active){
   const n = S.tickets.length;
   const item = (h, k, label, icon) => `<a href="#${h}" class="${active===k?'on':''}" ${active===k?'aria-current="page"':''}>${ic(icon)}${label}${k==='entradas'&&n?`<span class="dot">${n}</span>`:''}</a>`;
-  return `<nav class="nav" aria-label="Principal">${item('inicio','inicio','Inicio','home')}${item('explorar','explorar','Explorar','search')}${item('entradas','entradas','Entradas','ticket')}${item('perfil','perfil','Perfil','user')}</nav>`;
+  return `<nav class="nav" aria-label="Principal">${item('inicio','inicio','Eventos','home')}${item('entradas','entradas','Entradas','ticket')}${item('perfil','perfil','Perfil','user')}</nav>`;
 }
 
 /* ============ Vistas ============ */
+let selDay = null;
+const MONTHS = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+const groupLabel = d => { const x = dateOf(d), f = `${WD[x.getDay()]} ${x.getDate()} ${MO[x.getMonth()]}`; return d===0 ? `Hoy · ${f}` : d===1 ? `Mañana · ${f}` : f; };
 function vHome(){
   const c = city(S.city);
-  const feat = EVENTS.filter(e=>e.city===S.city).sort((a,b)=>(b.featured?1:0)-(a.featured?1:0)||a.day-b.day);
-  const tonight = EVENTS.filter(e=>e.day===0);
+  const all = EVENTS.filter(e=>e.city===S.city).sort((a,b)=>a.day-b.day || a.time.localeCompare(b.time));
+  const list = selDay===null ? all : all.filter(e=>e.day===selDay);
+  const groups = []; list.forEach(e => { const g = groups.find(x=>x.d===e.day); g ? g.items.push(e) : groups.push({d:e.day, items:[e]}); });
+  const m0 = MONTHS[dateOf(0).getMonth()], m1 = MONTHS[dateOf(13).getMonth()];
+  const day = d => { const x = dateOf(d), has = all.some(e=>e.day===d);
+    return `<button class="day ${has?'has':'none'} ${selDay===d?'on':''}" data-day="${d}" aria-pressed="${selDay===d}" aria-label="${groupLabel(d)}${has?'':', sin eventos'}"><small>${d===0?'hoy':WD[x.getDay()]}</small><b>${x.getDate()}</b><i></i></button>`; };
   return `<div class="view">
     <header class="top"><span class="logo">World <i>Party</i></span><a class="pill" href="#ciudades">${ic('pin')} ${esc(c.name)}</a></header>
-    <div class="hello"><h1>¿Dónde es la <em>fiesta</em> hoy?</h1><p>Clubes, fiestas privadas y conciertos en cualquier ciudad.</p></div>
-    <a class="search" href="#explorar">${ic('search')}<span>Buscar eventos, clubes o ciudades</span></a>
-    <section class="section"><div class="sec-head"><h2>En ${esc(c.name)}</h2><a href="#city-${c.id}">Ver todo</a></div>
-      <div class="rail">${feat.map(e=>`<a class="feat ph" href="#ev-${e.id}"><img src="${IMG(e.img,800)}" alt="${esc(e.title)}" loading="lazy"><div class="shade"></div>
-        <div class="tl"><span class="badge ${e.day===0?'gold':''}">${dayLabel(e.day)}</span><span class="badge">${TYPE[e.type]}</span></div>
-        <div class="meta"><h3>${esc(e.title)}</h3><span class="sub">${esc(e.venue)} · ${e.time}</span>
-        <div class="row"><span class="price">${money(fromPrice(e), c.cur)} <small>desde</small></span><span class="cta-sm">Entradas</span></div></div></a>`).join('')}</div>
-    </section>
-    <section class="section"><div class="sec-head"><h2>Ciudades</h2><a href="#ciudades">Todas</a></div>
-      <div class="cities">${CITIES.slice(0,6).map((x,i)=>cityTile(x, i===0)).join('')}</div>
-    </section>
-    ${tonight.length?`<section class="section"><div class="sec-head"><h2>Esta noche en el mundo</h2></div>${tonight.map(e=>miniRow(e, `${city(e.city).name} · ${e.time}`, `#ev-${e.id}`)).join('')}</section>`:''}
+    <div class="cal-head"><span>${ic('cal')} ${m0===m1?m0:`${m0} – ${m1}`}</span><span>${all.length} eventos</span></div>
+    <div class="days" role="group" aria-label="Calendario">
+      <button class="day all ${selDay===null?'on':''}" data-day="all" aria-pressed="${selDay===null}">Todo</button>
+      ${Array.from({length:14},(_,d)=>day(d)).join('')}
+    </div>
+    ${groups.length ? groups.map(g=>`<h2 class="ghead">${groupLabel(g.d)}</h2><div class="list">${g.items.map(eventCard).join('')}</div>`).join('')
+      : `<div class="list"><div class="empty"><b>Sin eventos este día</b>Elige otro día en el calendario.<div style="margin-top:16px"><button class="cta-sm" data-day="all">Ver todos</button></div></div></div>`}
   </div>${nav('inicio')}`;
 }
 function cityTile(x, wide){
-  const n = EVENTS.filter(e=>e.city===x.id).length, live = EVENTS.some(e=>e.city===x.id && e.day===0);
-  return `<a class="city ph ${wide?'wide':''}" href="#city-${x.id}"><img src="${IMG(x.img, wide?900:500)}" alt="${esc(x.name)}" loading="lazy"><div class="shade"></div>
-    ${live?'<span class="badge gold live">Hoy hay fiesta</span>':''}
+  const n = EVENTS.filter(e=>e.city===x.id).length, cur = x.id===S.city;
+  return `<a class="city ph ${wide?'wide':''}" href="#city-${x.id}" ${cur?'aria-current="true"':''}><img src="${IMG(x.img, wide?900:500)}" alt="${esc(x.name)}" loading="lazy"><div class="shade"></div>
+    ${cur?'<span class="badge gold live">Tu ciudad</span>':''}
     <div class="lbl"><b>${esc(x.name)}</b><span>${x.country} · ${n} eventos</span></div></a>`;
 }
 function vCities(){
@@ -445,19 +467,6 @@ function vCities(){
     <p class="fine" style="margin-top:18px">¿Tu ciudad no está? Pronto llegamos a más ciudades.</p></section>
   </div>${nav('inicio')}`;
 }
-function vCity(id){
-  const c = city(id); if (!c) return vCities();
-  if (S.city !== id){ S.city = id; save(); }
-  const F = [['todo','Todo'],['hoy','Hoy'],['finde','Este finde'],['club','Clubes'],['house','Fiestas privadas'],['concierto','Conciertos']];
-  const list = EVENTS.filter(e=>e.city===id).filter(e=> cityFilter==='todo' || (cityFilter==='hoy'&&e.day===0) || (cityFilter==='finde'&&isWeekend(e.day)) || e.type===cityFilter).sort((a,b)=>a.day-b.day);
-  return `<div class="view">
-    <div class="chero ph"><img src="${IMG(c.img,1000)}" alt="${esc(c.name)}"><div class="shade"></div>
-      <div class="bar"><a class="icon-btn" href="#inicio" aria-label="Volver">${ic('back')}</a><span class="badge">${EVENTS.filter(e=>e.city===id).length} eventos</span></div>
-      <div class="t"><span class="eyebrow">${c.country}</span><h1>${esc(c.name)}</h1><p>Lo que pasa esta semana, de clubes a casas.</p></div></div>
-    <div class="chips" role="group" aria-label="Filtros">${F.map(([k,l])=>`<button class="chip ${cityFilter===k?'on':''}" data-filter="${k}" aria-pressed="${cityFilter===k}">${l}</button>`).join('')}</div>
-    <div class="list">${list.length ? list.map(eventCard).join('') : `<div class="empty"><b>Nada por aquí… todavía</b>Prueba otro filtro o vuelve más tarde.</div>`}</div>
-  </div>${nav('explorar')}`;
-}
 function vEvent(id){
   const e = ev(id); if (!e) return vHome();
   const c = city(e.city), fav = S.favs.includes(e.id);
@@ -466,7 +475,7 @@ function vEvent(id){
   const pts = e.t.reduce((s,t)=>s + q[t.k]*PTS[t.k], 0);
   return `<div class="view">
     <div class="ehero ph"><img src="${IMG(e.img,1000)}" alt="${esc(e.title)}"><div class="shade"></div>
-      <div class="bar"><a class="icon-btn" href="#city-${e.city}" aria-label="Volver">${ic('back')}</a>
+      <div class="bar"><a class="icon-btn" href="#inicio" aria-label="Volver">${ic('back')}</a>
       <div style="display:flex;gap:8px"><button class="icon-btn" data-share="${e.id}" aria-label="Compartir">${ic('share')}</button><button class="icon-btn ${fav?'on':''}" data-fav="${e.id}" aria-label="${fav?'Quitar de guardados':'Guardar'}">${ic('heart')}</button></div></div></div>
     <div class="edet">
       <div style="display:flex;gap:6px;margin-bottom:10px"><span class="badge">${TYPE[e.type]}</span>${e.verified?`<span class="badge cream">${ic('shield','style="width:12px;height:12px"')} Anfitrión verificado</span>`:''}<span class="badge">18+</span></div>
@@ -531,20 +540,6 @@ function vTickets(){
     <section class="section"><div class="sec-head"><h2>Guardados</h2></div>${favs.length ? favs.map(e=>miniRow(e, `${city(e.city).name} · ${dayLabel(e.day)}`, `#ev-${e.id}`)).join('') : `<p style="color:var(--muted);font-size:14px">Toca el corazón en un evento para guardarlo.</p>`}</section>
   </div>${nav('entradas')}`;
 }
-function vExplore(){
-  const q = query.trim().toLowerCase();
-  const res = q ? EVENTS.filter(e => [e.title,e.venue,e.area,city(e.city).name,TYPE[e.type]].join(' ').toLowerCase().includes(q)) : EVENTS.slice().sort((a,b)=>a.day-b.day);
-  const cs = q ? CITIES.filter(c=>c.name.toLowerCase().includes(q)) : [];
-  return `<div class="view">
-    <label class="sbox">${ic('search')}<span class="sr">Buscar</span><input id="q" type="search" value="${esc(query)}" placeholder="Eventos, clubes, ciudades…" autocomplete="off"></label>
-    <div id="results">${exploreResults(res, cs, q)}</div>
-  </div>${nav('explorar')}`;
-}
-function exploreResults(res, cs, q){
-  return `${cs.length?`<section class="section"><div class="cities">${cs.map(c=>cityTile(c,true)).join('')}</div></section>`:''}
-    <section class="section"><div class="sec-head"><h2>${q?`${res.length} resultado${res.length===1?'':'s'}`:'Próximos eventos'}</h2></div></section>
-    <div class="list" style="padding-top:0">${res.length?res.map(eventCard).join(''):`<div class="empty"><b>Sin resultados</b>Prueba con una ciudad o un tipo de evento.</div>`}</div>`;
-}
 function vProfile(){
   const L = level(S.earned), pct = L.next ? Math.min(100, (S.earned-L.cur.at)/(L.next.at-L.cur.at)*100) : 100;
   const spent = S.tickets.length, cities = new Set(S.tickets.map(t=>ev(t.ev).city)).size;
@@ -572,9 +567,9 @@ let sessionFresh = null;
 function route(){
   const h = location.hash.replace('#','') || 'inicio';
   if (h.startsWith('ev-')) return vEvent(h.slice(3));
-  if (h.startsWith('city-')) return vCity(h.slice(5));
+  if (h.startsWith('city-')){ if (city(h.slice(5))){ S.city = h.slice(5); save(); } selDay = null; history.replaceState(null,'','#inicio'); lastHash = '#inicio'; return vHome(); }
   if (h.startsWith('tk-')) return vTicket(h.slice(3));
-  return ({inicio:vHome, ciudades:vCities, explorar:vExplore, entradas:vTickets, perfil:vProfile}[h] || vHome)();
+  return ({inicio:vHome, ciudades:vCities, entradas:vTickets, perfil:vProfile}[h] || vHome)();
 }
 let lastHash = null;
 function render(keepScroll){
@@ -591,18 +586,14 @@ window.addEventListener('hashchange', () => { if (location.hash !== lastHash){ s
 /* fotos rotas → fondo vino */
 document.addEventListener('error', e => { if (e.target.tagName === 'IMG') e.target.classList.add('broken'); }, true);
 
-document.addEventListener('input', e => {
-  if (e.target.id === 'q'){ query = e.target.value; const q = query.trim().toLowerCase();
-    const res = q ? EVENTS.filter(x => [x.title,x.venue,x.area,city(x.city).name,TYPE[x.type]].join(' ').toLowerCase().includes(q)) : EVENTS.slice().sort((a,b)=>a.day-b.day);
-    $('#results').innerHTML = exploreResults(res, q ? CITIES.filter(c=>c.name.toLowerCase().includes(q)) : [], q); }
-});
 document.addEventListener('change', e => { const p = e.target.dataset && e.target.dataset.pay; if (p) payMethod = p; });
 
 document.addEventListener('click', e => {
-  const b = e.target.closest('[data-fav],[data-inc],[data-dec],[data-filter],[data-checkout],[data-close],[data-pay-now],[data-redeem],[data-share],[data-reset]');
+  const b = e.target.closest('[data-day],[data-fav],[data-inc],[data-dec],[data-filter],[data-checkout],[data-close],[data-pay-now],[data-redeem],[data-share],[data-reset]');
   if (!b) return;
   const d = b.dataset;
-  if (d.fav){ e.preventDefault(); e.stopPropagation(); const i = S.favs.indexOf(d.fav); i<0 ? S.favs.push(d.fav) : S.favs.splice(i,1); save(); toast(i<0?'Guardado ♥':'Quitado de guardados'); render(true); }
+  if (d.day){ selDay = d.day==='all' ? null : (selDay===+d.day ? null : +d.day); render(true); }
+  else if (d.fav){ e.preventDefault(); e.stopPropagation(); const i = S.favs.indexOf(d.fav); i<0 ? S.favs.push(d.fav) : S.favs.splice(i,1); save(); toast(i<0?'Guardado ♥':'Quitado de guardados'); render(true); }
   else if (d.inc || d.dec){ const [id,k] = (d.inc||d.dec).split(':'); cart[id][k] = Math.max(0, cart[id][k] + (d.inc?1:-1)); render(true); }
   else if (d.filter){ cityFilter = d.filter; render(true); }
   else if (d.checkout){ sheet = d.checkout; render(true); }
