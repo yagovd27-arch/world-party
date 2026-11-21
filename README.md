@@ -1,6 +1,6 @@
-# World Party
+# Denoche
 
-Prototipo navegable de una app para encontrar fiestas y eventos en cualquier ciudad: clubes, fiestas privadas y conciertos.
+Denoche — prototipo navegable de una app para encontrar fiestas y eventos en cualquier ciudad: clubes, fiestas privadas y conciertos.
 
 ## Qué incluye
 - **Inicio**: ciudad actual, destacados de la ciudad y ciudades con foto.
