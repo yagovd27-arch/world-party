@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#4A1222">
+<title>World Party</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --wine-950:#2A0A13; --wine-900:#3A0E1B; --wine-800:#4A1222; --wine-700:#5C1A2B; --wine-600:#73253A; --wine-500:#8C3249;
+  --cream:#F5EBDA; --cream-2:#E8D8BF; --cream-3:#CDB89A; --gold:#C9A46C; --gold-2:#E2C493;
+  --line:rgba(245,235,218,.12); --muted:rgba(245,235,218,.66);
+  --r-lg:22px; --r-md:16px; --r-sm:12px;
+  --safe-t:env(safe-area-inset-top,0px); --safe-b:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%}
+body{background:#1B060C;color:var(--cream);font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+a{color:inherit;text-decoration:none}
+.serif{font-family:'Playfair Display',Georgia,serif}
+h1,h2,h3{margin:0}
+p{margin:0}
+
+/* Phone shell */
+.shell{max-width:430px;min-height:100%;margin:0 auto;background:var(--wine-800);position:relative;overflow-x:hidden}
+@media (min-width:600px){
+  body{display:flex;align-items:center;justify-content:center;padding:24px;background:radial-gradient(circle at 30% 20%,#3a0e1b,#12040a 70%)}
+  .shell{height:min(880px,calc(100vh - 48px));min-height:0;border-radius:44px;box-shadow:0 40px 120px rgba(0,0,0,.6),0 0 0 10px #0d0306,0 0 0 11px #2d0d16;overflow:hidden}
+  .shell .scroll{height:100%;overflow-y:auto}
+}
+.scroll{min-height:100%;padding-bottom:110px}
+.scroll::-webkit-scrollbar{display:none}
+.view{animation:in .35s cubic-bezier(.2,.8,.2,1)}
+@keyframes in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* Photos with graceful fallback */
+.ph{position:relative;overflow:hidden;background:linear-gradient(135deg,var(--wine-600),var(--wine-900))}
+.ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .6s ease,opacity .4s}
+.ph img.broken{display:none}
+.ph .shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(42,10,19,.05) 20%,rgba(42,10,19,.9) 100%)}
+
+/* Top bar */
+.top{padding:calc(18px + var(--safe-t)) 20px 6px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.logo{font-family:'Playfair Display',serif;font-weight:800;font-size:24px;letter-spacing:.2px}
+.logo i{font-style:italic;color:var(--gold-2)}
+.pill{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:rgba(245,235,218,.06);border-radius:999px;padding:8px 12px;font-size:13px;font-weight:600}
+.pill svg{width:15px;height:15px}
+.icon-btn{width:42px;height:42px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:rgba(42,10,19,.55);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--line)}
+.icon-btn svg{width:20px;height:20px}
+.icon-btn.on svg{fill:var(--gold-2);stroke:var(--gold-2)}
+
+.section{padding:22px 20px 0}
+.sec-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px}
+.sec-head h2{font-family:'Playfair Display',serif;font-size:22px;font-weight:700}
+.sec-head a,.sec-head button{font-size:13px;color:var(--gold-2);font-weight:600}
+.eyebrow{font-size:11px;letter-spacing:1.6px;text-transform:uppercase;font-weight:700;color:var(--gold-2)}
+
+/* Hero home */
+.hello{padding:8px 20px 0}
+.hello h1{font-family:'Playfair Display',serif;font-size:34px;line-height:1.08;font-weight:800}
+.hello h1 em{color:var(--gold-2)}
+.hello p{margin-top:8px;color:var(--muted);font-size:14px}
+.search{margin:16px 20px 0;display:flex;align-items:center;gap:10px;background:var(--cream);color:var(--wine-900);border-radius:var(--r-md);padding:14px 16px;font-size:15px;font-weight:500;width:calc(100% - 40px);text-align:left}
+.search svg{width:18px;height:18px;flex-shrink:0}
+.search span{opacity:.6}
+
+/* Carousel */
+.rail{display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;padding:0 20px 4px;margin:0 -20px}
+.rail::-webkit-scrollbar{display:none}
+.feat{flex:0 0 78%;scroll-snap-align:start;height:300px;border-radius:var(--r-lg);text-align:left}
+.feat:active img,.ecard:active img,.city:active img{transform:scale(1.04)}
+.feat .meta{position:absolute;left:16px;right:16px;bottom:16px;display:flex;flex-direction:column;gap:6px}
+.feat .meta h3{font-family:'Playfair Display',serif;font-size:24px;font-weight:700;line-height:1.1}
+.feat .meta .sub{font-size:13px;color:var(--cream-2)}
+.feat .row{display:flex;justify-content:space-between;align-items:center;margin-top:6px}
+.badge{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;border-radius:8px;padding:5px 8px;background:rgba(42,10,19,.6);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(245,235,218,.2)}
+.badge.gold{background:var(--gold);color:var(--wine-950);border-color:transparent}
+.badge.cream{background:var(--cream);color:var(--wine-900);border-color:transparent}
+.tl{position:absolute;top:14px;left:14px;display:flex;gap:6px}
+.tr{position:absolute;top:10px;right:10px}
+.price{font-weight:800;font-size:15px}
+.price small{font-weight:500;font-size:12px;color:var(--cream-2)}
+
+/* City grid */
+.cities{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.city{height:170px;border-radius:var(--r-lg);text-align:left;display:block;width:100%}
+.city.wide{grid-column:span 2;height:150px}
+.city .lbl{position:absolute;left:14px;right:14px;bottom:12px}
+.city .lbl b{display:block;font-family:'Playfair Display',serif;font-size:20px;font-weight:700;line-height:1.1}
+.city .lbl span{font-size:12px;color:var(--cream-2)}
+.city .live{position:absolute;top:12px;left:12px}
+
+/* Chips */
+.chips{display:flex;gap:8px;overflow-x:auto;padding:16px 20px 2px}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex-shrink:0;font-size:13px;font-weight:600;border-radius:999px;padding:9px 15px;border:1px solid var(--line);background:rgba(245,235,218,.05);transition:all .2s}
+.chip.on{background:var(--cream);color:var(--wine-900);border-color:var(--cream)}
+
+/* Event card */
+.list{display:flex;flex-direction:column;gap:16px;padding:16px 20px 0}
+.ecard{display:block;width:100%;text-align:left;border-radius:var(--r-lg);overflow:hidden;background:var(--wine-700);border:1px solid var(--line)}
+.ecard .ph{height:180px}
+.ecard .body{padding:14px 16px 16px;display:flex;flex-direction:column;gap:4px}
+.ecard h3{font-family:'Playfair Display',serif;font-size:21px;font-weight:700}
+.ecard .sub{font-size:13px;color:var(--muted)}
+.ecard .foot{display:flex;justify-content:space-between;align-items:center;margin-top:10px}
+.cta-sm{font-size:13px;font-weight:700;background:var(--cream);color:var(--wine-900);border-radius:12px;padding:10px 14px}
+.date-tile{position:absolute;bottom:12px;left:12px;background:var(--cream);color:var(--wine-900);border-radius:12px;padding:6px 10px;text-align:center;line-height:1.05}
+.date-tile b{display:block;font-family:'Playfair Display',serif;font-size:20px}
+.date-tile span{font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase}
+.scarce{font-size:12px;color:var(--gold-2);font-weight:600}
+
+/* City hero */
+.chero{height:280px}
+.chero .bar,.ehero .bar{position:absolute;top:calc(14px + var(--safe-t));left:16px;right:16px;display:flex;justify-content:space-between;z-index:2}
+.chero .t{position:absolute;left:20px;right:20px;bottom:18px}
+.chero .t h1{font-family:'Playfair Display',serif;font-size:42px;font-weight:800;line-height:1}
+.chero .t p{margin-top:6px;color:var(--cream-2);font-size:14px}
+
+/* Event detail */
+.ehero{height:380px}
+.ehero .shade{background:linear-gradient(180deg,rgba(42,10,19,.45) 0%,rgba(42,10,19,0) 30%,rgba(74,18,34,.4) 65%,var(--wine-800) 100%)}
+.edet{padding:0 20px;margin-top:-70px;position:relative}
+.edet h1{font-family:'Playfair Display',serif;font-size:34px;font-weight:800;line-height:1.05}
+.facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:18px}
+.fact{background:var(--wine-700);border:1px solid var(--line);border-radius:var(--r-md);padding:12px 14px;display:flex;gap:10px;align-items:flex-start}
+.fact svg{width:18px;height:18px;color:var(--gold-2);flex-shrink:0;margin-top:1px}
+.fact b{display:block;font-size:13px}
+.fact span{font-size:12px;color:var(--muted)}
+.desc{margin-top:18px;font-size:14.5px;line-height:1.6;color:var(--cream-2)}
+.lineup{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.lineup span{font-size:13px;font-weight:600;border:1px solid var(--line);border-radius:999px;padding:7px 12px}
+.notice{margin-top:14px;display:flex;gap:10px;align-items:flex-start;font-size:13px;color:var(--cream-2);background:rgba(201,164,108,.1);border:1px solid rgba(201,164,108,.3);border-radius:var(--r-md);padding:12px 14px;line-height:1.45}
+.notice svg{width:18px;height:18px;color:var(--gold-2);flex-shrink:0}
+
+/* Tickets */
+.tiers{display:flex;flex-direction:column;gap:10px;margin-top:10px}
+.tier{border-radius:18px;padding:16px;display:flex;justify-content:space-between;align-items:center;gap:12px;background:var(--wine-700);border:1px solid var(--line);transition:border-color .2s,transform .2s}
+.tier.sel{border-color:var(--gold)}
+.tier.early{background:linear-gradient(135deg,#F5EBDA,#E8D3B0);color:var(--wine-900);border-color:transparent}
+.tier.vip{background:linear-gradient(135deg,#2A0A13,#4A1222);border-color:rgba(201,164,108,.5)}
+.tier.out{opacity:.5}
+.tier .nm{font-size:11px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase}
+.tier.vip .nm{color:var(--gold-2)}
+.tier .pr{font-size:20px;font-weight:800;margin-top:2px}
+.tier .nt{font-size:12px;opacity:.75;margin-top:2px}
+.step{display:flex;align-items:center;gap:12px}
+.step button{width:36px;height:36px;border-radius:50%;border:1.5px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;transition:transform .1s}
+.step button:active{transform:scale(.9)}
+.step button:disabled{opacity:.3;cursor:not-allowed}
+.step b{min-width:16px;text-align:center;font-size:17px}
+.step button.plus{background:var(--cream);color:var(--wine-900);border-color:var(--cream)}
+.tier.early .step button.plus{background:var(--wine-800);color:var(--cream);border-color:var(--wine-800)}
+.ptsnote{display:flex;align-items:center;gap:8px;margin-top:14px;font-size:13px;color:var(--muted)}
+
+/* Sticky buy bar */
+.buybar{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:430px;padding:14px 20px calc(16px + var(--safe-b));background:rgba(42,10,19,.92);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px;z-index:20}
+@media (min-width:600px){.buybar,.nav{position:absolute}}
+.buybar .tot span{font-size:12px;color:var(--muted)}
+.buybar .tot b{display:block;font-family:'Playfair Display',serif;font-size:24px}
+.cta{background:var(--cream);color:var(--wine-900);font-weight:800;font-size:15px;border-radius:16px;padding:16px 26px;transition:transform .1s,opacity .2s}
+.cta:active{transform:scale(.97)}
+.cta:disabled{opacity:.35}
+.cta.block{width:100%;display:block;text-align:center}
+.cta.gold{background:var(--gold);color:var(--wine-950)}
+
+/* Bottom nav */
+.nav{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:430px;display:flex;justify-content:space-around;padding:10px 8px calc(12px + var(--safe-b));background:rgba(42,10,19,.92);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid var(--line);z-index:20}
+.nav a{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11px;font-weight:600;color:var(--muted);padding:4px 10px;position:relative}
+.nav a svg{width:22px;height:22px}
+.nav a.on{color:var(--cream)}
+.nav a.on::after{content:"";position:absolute;top:-10px;width:22px;height:3px;border-radius:3px;background:var(--gold)}
+.nav .dot{position:absolute;top:0;right:10px;min-width:16px;height:16px;border-radius:8px;background:var(--gold);color:var(--wine-950);font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;padding:0 4px}
+
+/* Sheet */
+.overlay{position:fixed;inset:0;background:rgba(10,2,5,.6);z-index:40;animation:fade .2s}
+@media (min-width:600px){.overlay,.sheet{position:absolute}}
+@keyframes fade{from{opacity:0}}
+.sheet{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:430px;background:var(--wine-800);border-radius:28px 28px 0 0;padding:10px 20px calc(22px + var(--safe-b));z-index:41;animation:up .3s cubic-bezier(.2,.8,.2,1);border-top:1px solid var(--line);max-height:90%;overflow-y:auto}
+@keyframes up{from{transform:translate(-50%,100%)}}
+.grab{width:40px;height:5px;border-radius:3px;background:var(--line);margin:4px auto 16px}
+.sum-row{display:flex;justify-content:space-between;font-size:14px;padding:8px 0;color:var(--cream-2)}
+.sum-row.total{border-top:1px solid var(--line);margin-top:6px;padding-top:14px;color:var(--cream);font-weight:800;font-size:17px}
+.pay{display:flex;flex-direction:column;gap:8px;margin:16px 0}
+.pay label{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-radius:var(--r-md);border:1px solid var(--line);background:var(--wine-700);font-size:14px;font-weight:600;cursor:pointer}
+.pay input{accent-color:var(--gold);width:18px;height:18px}
+.fine{font-size:11.5px;color:var(--muted);text-align:center;margin-top:10px}
+
+/* Ticket */
+.ticket{margin:10px 20px 0;border-radius:26px;overflow:hidden;background:var(--cream);color:var(--wine-900)}
+.ticket .ph{height:170px}
+.ticket .tb{padding:18px 20px}
+.ticket h2{font-family:'Playfair Display',serif;font-size:24px;font-weight:800}
+.perf{position:relative;height:24px;margin:0 -1px}
+.perf::before{content:"";position:absolute;left:18px;right:18px;top:50%;border-top:2px dashed rgba(58,14,27,.25)}
+.perf::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 0 50%,var(--wine-800) 12px,transparent 13px),radial-gradient(circle at 100% 50%,var(--wine-800) 12px,transparent 13px)}
+.qr{display:flex;flex-direction:column;align-items:center;gap:10px;padding:6px 20px 22px}
+.qr svg{width:190px;height:190px}
+.tgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:14px}
+.tgrid span{display:block;font-size:10.5px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;opacity:.55}
+.tgrid b{font-size:14px}
+.success{text-align:center;padding:calc(30px + var(--safe-t)) 20px 4px}
+.success .ok{width:64px;height:64px;border-radius:50%;background:var(--gold);color:var(--wine-950);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;animation:pop .5s cubic-bezier(.2,1.6,.4,1)}
+@keyframes pop{from{transform:scale(0)}}
+.success .ok svg{width:32px;height:32px}
+.success h1{font-family:'Playfair Display',serif;font-size:30px;font-weight:800}
+.success p{color:var(--muted);margin-top:6px;font-size:14px}
+
+/* Profile */
+.prof{display:flex;align-items:center;gap:14px;padding:calc(22px + var(--safe-t)) 20px 0}
+.ava{width:68px;height:68px;border-radius:50%;background:linear-gradient(135deg,var(--cream),var(--gold));color:var(--wine-900);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:28px;font-weight:800;box-shadow:0 0 0 3px var(--wine-800),0 0 0 4px var(--gold)}
+.prof h1{font-family:'Playfair Display',serif;font-size:26px;font-weight:800}
+.prof p{font-size:13px;color:var(--muted)}
+.pts{margin:18px 20px 0;border-radius:26px;padding:20px;background:linear-gradient(140deg,#F5EBDA 0%,#E6CFA8 100%);color:var(--wine-900);position:relative;overflow:hidden}
+.pts::after{content:"";position:absolute;right:-50px;top:-50px;width:180px;height:180px;border-radius:50%;border:24px solid rgba(92,26,43,.08)}
+.pts .big{font-family:'Playfair Display',serif;font-size:46px;font-weight:800;line-height:1;margin-top:4px}
+.pts .lvl{display:flex;justify-content:space-between;font-size:12px;font-weight:700;margin-top:16px}
+.bar{height:8px;border-radius:8px;background:rgba(92,26,43,.15);overflow:hidden;margin-top:8px}
+.bar i{display:block;height:100%;background:var(--wine-700);border-radius:8px;transition:width .6s}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:14px 20px 0}
+.stat{background:var(--wine-700);border:1px solid var(--line);border-radius:var(--r-md);padding:12px;text-align:center}
+.stat b{display:block;font-family:'Playfair Display',serif;font-size:22px}
+.stat span{font-size:11px;color:var(--muted)}
+.promo{display:flex;align-items:center;gap:14px;background:var(--wine-700);border:1px solid var(--line);border-radius:18px;padding:14px;margin-bottom:10px}
+.promo .ic{width:46px;height:46px;border-radius:14px;background:rgba(201,164,108,.15);color:var(--gold-2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.promo .ic svg{width:22px;height:22px}
+.promo .tx{flex:1;min-width:0}
+.promo .tx b{display:block;font-size:14.5px}
+.promo .tx span{font-size:12px;color:var(--muted)}
+.redeem{font-size:12.5px;font-weight:800;border-radius:12px;padding:10px 12px;background:var(--cream);color:var(--wine-900);white-space:nowrap}
+.redeem:disabled{background:transparent;color:var(--muted);border:1px solid var(--line)}
+.code{font-family:ui-monospace,Menlo,monospace;font-size:12px;font-weight:700;color:var(--gold-2);border:1px dashed var(--gold);border-radius:10px;padding:8px 10px;white-space:nowrap}
+.mini{display:flex;align-items:center;gap:12px;padding:10px;border-radius:18px;background:var(--wine-700);border:1px solid var(--line);margin-bottom:10px;width:100%;text-align:left}
+.mini .ph{width:64px;height:64px;border-radius:14px;flex-shrink:0}
+.mini .tx{flex:1;min-width:0}
+.mini b{display:block;font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mini span{font-size:12px;color:var(--muted)}
+.empty{text-align:center;padding:40px 20px;color:var(--muted);font-size:14px;border:1px dashed var(--line);border-radius:var(--r-lg)}
+.empty b{display:block;color:var(--cream);font-family:'Playfair Display',serif;font-size:20px;margin-bottom:6px}
+
+/* Search */
+.sbox{margin:calc(18px + var(--safe-t)) 20px 0;display:flex;align-items:center;gap:10px;background:var(--cream);color:var(--wine-900);border-radius:var(--r-md);padding:4px 6px 4px 16px}
+.sbox svg{width:18px;height:18px;flex-shrink:0}
+.sbox input{flex:1;border:0;background:transparent;font:inherit;font-size:16px;padding:12px 0;color:var(--wine-900);outline:none;min-width:0}
+.sbox input::-webkit-search-cancel-button{-webkit-appearance:none}
+.sbox input::placeholder{color:rgba(58,14,27,.5)}
+
+/* Toast */
+.toast{position:fixed;left:50%;bottom:110px;transform:translateX(-50%);background:var(--cream);color:var(--wine-900);font-weight:700;font-size:14px;padding:12px 18px;border-radius:14px;box-shadow:0 10px 40px rgba(0,0,0,.4);z-index:60;animation:toast 2.6s forwards;white-space:nowrap}
+@media (min-width:600px){.toast{position:absolute}}
+@keyframes toast{0%{opacity:0;transform:translate(-50%,10px)}10%,85%{opacity:1;transform:translate(-50%,0)}100%{opacity:0}}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+:focus-visible{outline:2px solid var(--gold-2);outline-offset:2px}
+</style>
+</head>
+<body>
+<div class="shell" id="shell"><div class="scroll" id="scroll"><main id="app"></main></div><div id="layer"></div></div>
+
+<script>
+/* ============ Datos de ejemplo ============ */
+const IMG = (id, w=900) => `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${w}&q=70`;
+
+const CITIES = [
+  {id:'gurugram', name:'Gurugram', country:'India', cur:'₹', img:'photo-1589829973523-e4ddcbbd40e7'},
+  {id:'delhi', name:'Delhi', country:'India', cur:'₹', img:'photo-1587474260584-136574528ed5'},
+  {id:'cdmx', name:'Ciudad de México', country:'México', cur:'$', img:'photo-1599067821475-c47c29093bf7'},
+  {id:'puebla', name:'Puebla', country:'México', cur:'$', img:'photo-1653661279002-692227e35f0f'},
+  {id:'monterrey', name:'Monterrey', country:'México', cur:'$', img:'photo-1561158250-01426799e9e0'},
+  {id:'guadalajara', name:'Guadalajara', country:'México', cur:'$', img:'photo-1599624893198-d000bdd8bef8'},
+  {id:'shanghai', name:'Shanghai', country:'China', cur:'¥', img:'photo-1627484986972-e544190b8abb'}
+];
+
+const P = { in:[799,1199,3999], mx:[250,400,1200], cn:[120,180,600] };
+const tiers = (p, earlyLeft=24, vipNote='Mesa reservada · barra exclusiva') => [
+  {k:'early', name:'Early bird', price:p[0], left:earlyLeft, note: earlyLeft ? `Quedan ${earlyLeft}` : 'Agotado'},
+  {k:'general', name:'General', price:p[1], left:200, note:'Acceso general'},
+  {k:'vip', name:'VIP', price:p[2], left:12, note:vipNote}
+];
+const daysTo = iso => Math.max(0, Math.round((new Date(iso+'T12:00') - new Date(new Date().toDateString()+' 12:00'))/864e5));
+
+const EVENTS = [
+  {id:'la-desgracia-navidad', city:'gurugram', type:'house', title:'LA DESGRACIA · Navidad', venue:'Fiesta privada', area:'Gurugram', day:daysTo('2026-12-19'), time:'22:00', img:'photo-1517263904808-5dc91e3e7044', host:'Yago', verified:true, featured:true,
+    desc:'Segunda edición de LA DESGRACIA. Después de Halloween, vuelve en versión navideña: música toda la noche, dress code rojo y mucha gente nueva en la ciudad.', lineup:['DJ invitado','Open decks'], t:tiers(P.in,0)},
+  {id:'neon-saturdays', city:'gurugram', type:'club', title:'Neon Saturdays', venue:'Club Aurora', area:'Sector 29', day:0, time:'23:00', img:'photo-1764510377343-e5b12385791b', featured:true,
+    desc:'La noche más larga de Sector 29. House y tech house hasta que cierre el club.', lineup:['DJ residente','Invitado sorpresa'], t:tiers(P.in,18)},
+  {id:'rooftop-sunset', city:'gurugram', type:'club', title:'Rooftop Sunset Sessions', venue:'Terraza Kaya', area:'Cyber Hub', day:1, time:'18:30', img:'photo-1758810409996-583f3bad7d51',
+    desc:'Atardecer, cócteles y deep house en una terraza con vista a la ciudad.', lineup:['Sunset DJ set'], t:tiers(P.in,9)},
+  {id:'techno-vault', city:'delhi', type:'club', title:'Techno Underground', venue:'The Vault', area:'Hauz Khas', day:2, time:'23:30', img:'photo-1578736641330-3155e606cd40', featured:true,
+    desc:'Techno oscuro, sistema de sonido potente y cero luces innecesarias.', lineup:['Line-up por anunciar'], t:tiers(P.in,30)},
+  {id:'bollywood-night', city:'delhi', type:'club', title:'Bollywood Night', venue:'Club Saaz', area:'Connaught Place', day:4, time:'22:00', img:'photo-1545128485-c400e7702796',
+    desc:'Los éxitos de Bollywood de siempre mezclados con lo más nuevo.', lineup:['DJ residente'], t:tiers(P.in,40)},
+  {id:'casa-meera', city:'delhi', type:'house', title:'Sunday Home Session', venue:'Casa privada', area:'Vasant Vihar', day:1, time:'20:00', img:'photo-1764174861962-5b109301b1ad', host:'Meera', verified:true,
+    desc:'House party íntima, cupo limitado. Trae buena energía.', lineup:['Playlist colaborativa'], t:tiers([499,699,1499],6,'Acceso a terraza + bebida')},
+  {id:'noche-roma', city:'cdmx', type:'club', title:'Noche Roma', venue:'Club Lumbre', area:'Col. Roma', day:0, time:'23:00', img:'photo-1763757575623-ffafe0867aa3', featured:true,
+    desc:'Electrónica en el corazón de la Roma. Llega temprano, la fila crece rápido.', lineup:['DJ residente','B2B invitado'], t:tiers(P.mx,15)},
+  {id:'perreo-terraza', city:'cdmx', type:'club', title:'Perreo en la Terraza', venue:'Azotea Nube', area:'Condesa', day:2, time:'22:00', img:'photo-1713450605268-5f8ba67f5b55',
+    desc:'Reggaetón viejito y lo más nuevo, en una azotea de la Condesa.', lineup:['DJ residente'], t:tiers(P.mx,0)},
+  {id:'casa-coyoacan', city:'cdmx', type:'house', title:'Fiesta en casa · Coyoacán', venue:'Casa privada', area:'Coyoacán', day:3, time:'21:00', img:'photo-1645730826845-cd2ddec9984f', host:'Andrea', verified:true,
+    desc:'House party con jardín, buena música y gente buena onda.', lineup:['Playlist del host'], t:tiers([150,250,600],10,'Barra libre 2 h')},
+  {id:'reventon-angelopolis', city:'puebla', type:'club', title:'Reventón Angelópolis', venue:'Club Talavera', area:'Angelópolis', day:1, time:'22:30', img:'photo-1574155376612-bfa4ed8aabfd', featured:true,
+    desc:'La noche grande de Puebla: tres ambientes y pista principal llena.', lineup:['DJ residente','Invitado'], t:tiers(P.mx,22)},
+  {id:'casa-cholula', city:'puebla', type:'house', title:'Pool Party · Cholula', venue:'Casa privada', area:'Cholula', day:5, time:'15:00', img:'photo-1519671482749-fd09be7ccebf', host:'Diego', verified:true,
+    desc:'Alberca, parrilla y música desde la tarde.', lineup:['Playlist del host'], t:tiers([200,300,700],12,'Camastro reservado')},
+  {id:'san-pedro-nights', city:'monterrey', type:'club', title:'San Pedro Nights', venue:'Club Norte', area:'San Pedro', day:2, time:'23:00', img:'photo-1687511844598-165c1fc387cc',
+    desc:'Noche elegante en San Pedro con house y open format.', lineup:['DJ residente'], t:tiers(P.mx,20)},
+  {id:'fundidora-live', city:'monterrey', type:'concierto', title:'Concierto en Fundidora', venue:'Explanada', area:'Parque Fundidora', day:6, time:'20:00', img:'photo-1630395822970-acd6a691d97e',
+    desc:'Concierto al aire libre con varias bandas locales.', lineup:['Bandas por anunciar'], t:tiers([350,550,1500],50,'Zona frente al escenario')},
+  {id:'chapultepec-live', city:'guadalajara', type:'concierto', title:'Chapultepec Live', venue:'Foro Avenida', area:'Av. Chapultepec', day:3, time:'21:00', img:'photo-1574155376612-bfa4ed8aabfd',
+    desc:'Música en vivo y DJ después del show.', lineup:['Banda invitada','DJ set'], t:tiers(P.mx,25)},
+  {id:'providencia-after', city:'guadalajara', type:'house', title:'Afterparty Providencia', venue:'Casa privada', area:'Providencia', day:0, time:'02:00', img:'photo-1541532713592-79a0317b6b77', host:'Luis', verified:true,
+    desc:'El after que todos buscan cuando cierran los antros.', lineup:['Open decks'], t:tiers([180,280,650],8,'Acceso al rooftop')},
+  {id:'bund-rooftop', city:'shanghai', type:'club', title:'The Bund Rooftop', venue:'Sky Lounge', area:'The Bund', day:1, time:'21:00', img:'photo-1614221330834-9399e5631af3', featured:true,
+    desc:'Vista al skyline de Pudong, cócteles y house.', lineup:['DJ residente'], t:tiers(P.cn,14)},
+  {id:'warehouse-techno', city:'shanghai', type:'club', title:'Warehouse Techno', venue:'Dock 9', area:'Yangpu', day:4, time:'23:30', img:'photo-1764510377513-1e8c847fb7f8',
+    desc:'Techno en una nave industrial junto al río.', lineup:['Line-up por anunciar'], t:tiers(P.cn,30)}
+];
+
+const PROMOS = [
+  {id:'2x1', name:'2x1 en barra', place:'Clubes participantes', cost:300, icon:'glass'},
+  {id:'early', name:'Early bird garantizado', place:'Cualquier evento', cost:500, icon:'clock'},
+  {id:'free', name:'Entrada general gratis', place:'Cualquier club', cost:1200, icon:'ticket'},
+  {id:'vip', name:'Upgrade a VIP', place:'Eventos seleccionados', cost:2000, icon:'crown'}
+];
+const PTS = {early:50, general:80, vip:200};
+const LEVELS = [{n:'Bronce',at:0},{n:'Plata',at:1000},{n:'Oro',at:2500},{n:'Black',at:5000}];
+const TYPE = {club:'Club', house:'Fiesta privada', concierto:'Concierto'};
+
+/* ============ Estado ============ */
+const DEF = {points:640, earned:640, city:'gurugram', tickets:[], favs:[], codes:{}};
+let S; try { S = Object.assign({}, DEF, JSON.parse(localStorage.getItem('wp-state')||'{}')); } catch(e){ S = {...DEF}; }
+const save = () => { try { localStorage.setItem('wp-state', JSON.stringify(S)); } catch(e){} };
+const cart = {}; let cityFilter = 'todo'; let query = ''; let sheet = null; let payMethod = 'tarjeta';
+
+/* ============ Helpers ============ */
+const $ = s => document.querySelector(s);
+const city = id => CITIES.find(c => c.id === id);
+const ev = id => EVENTS.find(e => e.id === id);
+const money = (n, cur) => cur + n.toLocaleString('es-MX');
+const dateOf = d => { const x = new Date(); x.setDate(x.getDate()+d); return x; };
+const WD = ['dom','lun','mar','mié','jue','vie','sáb'], MO = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+const dayLabel = d => d===0 ? 'Hoy' : d===1 ? 'Mañana' : (x=>`${WD[x.getDay()]} ${x.getDate()} ${MO[x.getMonth()]}`)(dateOf(d));
+const isWeekend = d => d <= 7 && [0,5,6].includes(dateOf(d).getDay());
+const fromPrice = e => Math.min(...e.t.filter(t=>t.left>0).map(t=>t.price));
+const level = p => { let i = 0; LEVELS.forEach((l,j)=>{ if(p>=l.at) i=j; }); return {cur:LEVELS[i], next:LEVELS[i+1]}; };
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const photo = (id, cls='', w=900, alt='') => `<div class="ph ${cls}"><img src="${IMG(id,w)}" alt="${esc(alt)}" loading="lazy"><div class="shade"></div>`;
+
+const I = {
+  pin:'<path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21Z"/><circle cx="12" cy="9.5" r="2.5"/>',
+  search:'<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',
+  home:'<path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1Z"/>',
+  ticket:'<path d="M3 8a2 2 0 0 0 2-2h14a2 2 0 0 0 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 0-2 2H5a2 2 0 0 0-2-2v-2a2 2 0 0 0 0-4Z"/><path d="M14 6v12" stroke-dasharray="2 2"/>',
+  user:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
+  back:'<path d="m15 18-6-6 6-6"/>',
+  heart:'<path d="M12 20s-7.5-4.6-9.2-9.4C1.6 7 4 4 7.2 4c2 0 3.5 1.1 4.8 2.8C13.3 5.1 14.8 4 16.8 4 20 4 22.4 7 21.2 10.6 19.5 15.4 12 20 12 20Z"/>',
+  share:'<path d="M12 3v12M7 8l5-5 5 5"/><path d="M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/>',
+  cal:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',
+  clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  shield:'<path d="M12 3 4 6v6c0 4.5 3.4 8.3 8 9 4.6-.7 8-4.5 8-9V6Z"/><path d="m9 12 2 2 4-4"/>',
+  lock:'<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
+  check:'<path d="m5 12 5 5 9-10"/>',
+  glass:'<path d="M6 3h12l-1.5 8a4.5 4.5 0 0 1-9 0Z"/><path d="M12 15v6M8 21h8"/>',
+  crown:'<path d="m3 8 4.5 4L12 5l4.5 7L21 8l-2 11H5Z"/>',
+  star:'<path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9Z"/>',
+  people:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14a6 6 0 0 1 3.5 6"/>'
+};
+const ic = (n, extra='') => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ${extra}>${I[n]}</svg>`;
+
+function toast(msg){ const t = document.createElement('div'); t.className='toast'; t.setAttribute('role','status'); t.textContent = msg; $('#shell').appendChild(t); setTimeout(()=>t.remove(), 2700); }
+
+/* QR decorativo determinista */
+function qr(seed){
+  let h = 0; for (const c of seed) h = (h*31 + c.charCodeAt(0)) >>> 0;
+  const rnd = () => (h = (h*1664525 + 1013904223) >>> 0) / 4294967296;
+  const N = 25, s = 8; let r = '';
+  const finder = (x,y) => `<rect x="${x*s}" y="${y*s}" width="${7*s}" height="${7*s}" fill="#3A0E1B"/><rect x="${(x+1)*s}" y="${(y+1)*s}" width="${5*s}" height="${5*s}" fill="#F5EBDA"/><rect x="${(x+2)*s}" y="${(y+2)*s}" width="${3*s}" height="${3*s}" fill="#3A0E1B"/>`;
+  for (let y=0;y<N;y++) for (let x=0;x<N;x++){
+    const inF = (x<8&&y<8)||(x>N-9&&y<8)||(x<8&&y>N-9);
+    if (!inF && rnd() > .52) r += `<rect x="${x*s}" y="${y*s}" width="${s}" height="${s}" rx="1.5" fill="#3A0E1B"/>`;
+  }
+  return `<svg viewBox="0 0 ${N*s} ${N*s}" role="img" aria-label="Código QR de la entrada">${r}${finder(0,0)}${finder(N-7,0)}${finder(0,N-7)}</svg>`;
+}
+
+/* ============ Componentes ============ */
+function eventCard(e){
+  const c = city(e.city), fav = S.favs.includes(e.id), early = e.t[0];
+  return `<a class="ecard" href="#ev-${e.id}">
+    ${photo(e.img,'',800,e.title)}
+      <div class="tl"><span class="badge">${TYPE[e.type]}</span>${e.verified?`<span class="badge cream">${ic('shield','style="width:12px;height:12px"')} Verificado</span>`:''}</div>
+      <div class="tr"><button class="icon-btn ${fav?'on':''}" data-fav="${e.id}" aria-label="${fav?'Quitar de guardados':'Guardar'}">${ic('heart')}</button></div>
+      <div class="date-tile"><span>${dayLabel(e.day).split(' ')[0]}</span><b>${dateOf(e.day).getDate()}</b></div>
+    </div>
+    <div class="body">
+      <h3>${esc(e.title)}</h3>
+      <p class="sub">${esc(e.venue)} · ${esc(e.area)} · ${e.time}</p>
+      <div class="foot">
+        <div><span class="price">${money(fromPrice(e), c.cur)} <small>desde</small></span>${early.left>0 && early.left<20 ? `<div class="scarce">Early bird: quedan ${early.left}</div>`:''}</div>
+        <span class="cta-sm">Ver entradas</span>
+      </div>
+    </div></a>`;
+}
+function miniRow(e, sub, href){
+  return `<a class="mini" href="${href}">${photo(e.img,'',200,e.title)}</div><div class="tx"><b>${esc(e.title)}</b><span>${sub}</span></div>${ic('back','style="width:18px;height:18px;transform:rotate(180deg);opacity:.5"')}</a>`;
+}
+function nav(active){
+  const n = S.tickets.length;
+  const item = (h, k, label, icon) => `<a href="#${h}" class="${active===k?'on':''}" ${active===k?'aria-current="page"':''}>${ic(icon)}${label}${k==='entradas'&&n?`<span class="dot">${n}</span>`:''}</a>`;
+  return `<nav class="nav" aria-label="Principal">${item('inicio','inicio','Inicio','home')}${item('explorar','explorar','Explorar','search')}${item('entradas','entradas','Entradas','ticket')}${item('perfil','perfil','Perfil','user')}</nav>`;
+}
+
+/* ============ Vistas ============ */
+function vHome(){
+  const c = city(S.city);
+  const feat = EVENTS.filter(e=>e.city===S.city).sort((a,b)=>(b.featured?1:0)-(a.featured?1:0)||a.day-b.day);
+  const tonight = EVENTS.filter(e=>e.day===0);
+  return `<div class="view">
+    <header class="top"><span class="logo">World <i>Party</i></span><a class="pill" href="#ciudades">${ic('pin')} ${esc(c.name)}</a></header>
+    <div class="hello"><h1>¿Dónde es la <em>fiesta</em> hoy?</h1><p>Clubes, fiestas privadas y conciertos en cualquier ciudad.</p></div>
+    <a class="search" href="#explorar">${ic('search')}<span>Buscar eventos, clubes o ciudades</span></a>
+    <section class="section"><div class="sec-head"><h2>En ${esc(c.name)}</h2><a href="#city-${c.id}">Ver todo</a></div>
+      <div class="rail">${feat.map(e=>`<a class="feat ph" href="#ev-${e.id}"><img src="${IMG(e.img,800)}" alt="${esc(e.title)}" loading="lazy"><div class="shade"></div>
+        <div class="tl"><span class="badge ${e.day===0?'gold':''}">${dayLabel(e.day)}</span><span class="badge">${TYPE[e.type]}</span></div>
+        <div class="meta"><h3>${esc(e.title)}</h3><span class="sub">${esc(e.venue)} · ${e.time}</span>
+        <div class="row"><span class="price">${money(fromPrice(e), c.cur)} <small>desde</small></span><span class="cta-sm">Entradas</span></div></div></a>`).join('')}</div>
+    </section>
+    <section class="section"><div class="sec-head"><h2>Ciudades</h2><a href="#ciudades">Todas</a></div>
+      <div class="cities">${CITIES.slice(0,6).map((x,i)=>cityTile(x, i===0)).join('')}</div>
+    </section>
+    ${tonight.length?`<section class="section"><div class="sec-head"><h2>Esta noche en el mundo</h2></div>${tonight.map(e=>miniRow(e, `${city(e.city).name} · ${e.time}`, `#ev-${e.id}`)).join('')}</section>`:''}
+  </div>${nav('inicio')}`;
+}
+function cityTile(x, wide){
+  const n = EVENTS.filter(e=>e.city===x.id).length, live = EVENTS.some(e=>e.city===x.id && e.day===0);
+  return `<a class="city ph ${wide?'wide':''}" href="#city-${x.id}"><img src="${IMG(x.img, wide?900:500)}" alt="${esc(x.name)}" loading="lazy"><div class="shade"></div>
+    ${live?'<span class="badge gold live">Hoy hay fiesta</span>':''}
+    <div class="lbl"><b>${esc(x.name)}</b><span>${x.country} · ${n} eventos</span></div></a>`;
+}
+function vCities(){
+  return `<div class="view">
+    <header class="top"><a class="icon-btn" href="#inicio" aria-label="Volver">${ic('back')}</a><span class="logo" style="font-size:20px">Elige ciudad</span><span style="width:42px"></span></header>
+    <section class="section"><div class="cities">${CITIES.map((x,i)=>cityTile(x, i===0)).join('')}</div>
+    <p class="fine" style="margin-top:18px">¿Tu ciudad no está? Pronto llegamos a más ciudades.</p></section>
+  </div>${nav('inicio')}`;
+}
+function vCity(id){
+  const c = city(id); if (!c) return vCities();
+  if (S.city !== id){ S.city = id; save(); }
+  const F = [['todo','Todo'],['hoy','Hoy'],['finde','Este finde'],['club','Clubes'],['house','Fiestas privadas'],['concierto','Conciertos']];
+  const list = EVENTS.filter(e=>e.city===id).filter(e=> cityFilter==='todo' || (cityFilter==='hoy'&&e.day===0) || (cityFilter==='finde'&&isWeekend(e.day)) || e.type===cityFilter).sort((a,b)=>a.day-b.day);
+  return `<div class="view">
+    <div class="chero ph"><img src="${IMG(c.img,1000)}" alt="${esc(c.name)}"><div class="shade"></div>
+      <div class="bar"><a class="icon-btn" href="#inicio" aria-label="Volver">${ic('back')}</a><span class="badge">${EVENTS.filter(e=>e.city===id).length} eventos</span></div>
+      <div class="t"><span class="eyebrow">${c.country}</span><h1>${esc(c.name)}</h1><p>Lo que pasa esta semana, de clubes a casas.</p></div></div>
+    <div class="chips" role="group" aria-label="Filtros">${F.map(([k,l])=>`<button class="chip ${cityFilter===k?'on':''}" data-filter="${k}" aria-pressed="${cityFilter===k}">${l}</button>`).join('')}</div>
+    <div class="list">${list.length ? list.map(eventCard).join('') : `<div class="empty"><b>Nada por aquí… todavía</b>Prueba otro filtro o vuelve más tarde.</div>`}</div>
+  </div>${nav('explorar')}`;
+}
+function vEvent(id){
+  const e = ev(id); if (!e) return vHome();
+  const c = city(e.city), fav = S.favs.includes(e.id);
+  const q = cart[id] || (cart[id] = {early:0, general:0, vip:0});
+  const total = e.t.reduce((s,t)=>s + q[t.k]*t.price, 0), count = e.t.reduce((s,t)=>s+q[t.k],0);
+  const pts = e.t.reduce((s,t)=>s + q[t.k]*PTS[t.k], 0);
+  return `<div class="view">
+    <div class="ehero ph"><img src="${IMG(e.img,1000)}" alt="${esc(e.title)}"><div class="shade"></div>
+      <div class="bar"><a class="icon-btn" href="#city-${e.city}" aria-label="Volver">${ic('back')}</a>
+      <div style="display:flex;gap:8px"><button class="icon-btn" data-share="${e.id}" aria-label="Compartir">${ic('share')}</button><button class="icon-btn ${fav?'on':''}" data-fav="${e.id}" aria-label="${fav?'Quitar de guardados':'Guardar'}">${ic('heart')}</button></div></div></div>
+    <div class="edet">
+      <div style="display:flex;gap:6px;margin-bottom:10px"><span class="badge">${TYPE[e.type]}</span>${e.verified?`<span class="badge cream">${ic('shield','style="width:12px;height:12px"')} Anfitrión verificado</span>`:''}<span class="badge">18+</span></div>
+      <h1>${esc(e.title)}</h1>
+      <div class="facts">
+        <div class="fact">${ic('cal')}<div><b>${dayLabel(e.day)}</b><span>${e.time} h</span></div></div>
+        <div class="fact">${ic('pin')}<div><b>${esc(e.venue)}</b><span>${esc(e.area)}, ${esc(c.name)}</span></div></div>
+      </div>
+      ${e.type==='house'?`<div class="notice">${ic('lock')}<span>La dirección exacta se revela al comprar. Anfitrión verificado${e.host?' ('+esc(e.host)+')':''} · solo mayores de 18.</span></div>`:''}
+      <p class="desc">${esc(e.desc)}</p>
+      <div class="section" style="padding:20px 0 0"><span class="eyebrow">Line-up</span><div class="lineup">${e.lineup.map(l=>`<span>${esc(l)}</span>`).join('')}</div></div>
+      <div class="section" style="padding:24px 0 0"><div class="sec-head" style="margin-bottom:2px"><h2>Entradas</h2></div>
+      <div class="tiers">${e.t.map(t=>{ const out = t.left<=0, n = q[t.k];
+        return `<div class="tier ${t.k} ${out?'out':''} ${n?'sel':''}">
+          <div><div class="nm">${t.name}</div><div class="pr">${money(t.price,c.cur)}</div><div class="nt">${out?'Ya no quedan':t.note}</div></div>
+          ${out?'<span class="badge">Agotado</span>':`<div class="step"><button data-dec="${e.id}:${t.k}" ${n?'':'disabled'} aria-label="Quitar ${t.name}">−</button><b aria-live="polite">${n}</b><button class="plus" data-inc="${e.id}:${t.k}" ${n>=Math.min(10,t.left)?'disabled':''} aria-label="Añadir ${t.name}">+</button></div>`}
+        </div>`; }).join('')}</div>
+      <div class="ptsnote">${ic('star','style="width:16px;height:16px;color:var(--gold-2)"')} Ganas <b style="color:var(--cream)">&nbsp;${pts||PTS.general}&nbsp;pts&nbsp;</b> ${pts?'con esta compra':'por entrada general'}</div></div>
+      <div style="height:30px"></div>
+    </div>
+  </div>
+  <div class="buybar"><div class="tot"><span>${count?`${count} entrada${count>1?'s':''}`:'Elige tus entradas'}</span><b>${money(total,c.cur)}</b></div><button class="cta" data-checkout="${e.id}" ${count?'':'disabled'}>Comprar</button></div>`;
+}
+function sheetCheckout(id){
+  const e = ev(id), c = city(e.city), q = cart[id];
+  const lines = e.t.filter(t=>q[t.k]);
+  const sub = lines.reduce((s,t)=>s+q[t.k]*t.price,0), fee = Math.round(sub*0.05), pts = lines.reduce((s,t)=>s+q[t.k]*PTS[t.k],0);
+  const methods = c.country==='India' ? [['upi','UPI'],['tarjeta','Tarjeta'],['apple','Apple Pay']] : [['tarjeta','Tarjeta'],['apple','Apple Pay'],['oxxo', c.country==='México'?'OXXO':'Alipay']];
+  if (!methods.some(m=>m[0]===payMethod)) payMethod = methods[0][0];
+  return `<div class="overlay" data-close="1"></div><div class="sheet" role="dialog" aria-modal="true" aria-label="Pagar entradas"><div class="grab"></div>
+    <span class="eyebrow">Resumen</span><h2 class="serif" style="font-size:24px;margin:4px 0 12px">${esc(e.title)}</h2>
+    ${lines.map(t=>`<div class="sum-row"><span>${q[t.k]} × ${t.name}</span><span>${money(q[t.k]*t.price,c.cur)}</span></div>`).join('')}
+    <div class="sum-row"><span>Cargo por servicio</span><span>${money(fee,c.cur)}</span></div>
+    <div class="sum-row total"><span>Total</span><span>${money(sub+fee,c.cur)}</span></div>
+    <fieldset class="pay" style="border:0;padding:0"><legend class="eyebrow" style="margin-bottom:8px">Método de pago</legend>
+    ${methods.map(([k,l])=>`<label>${l}<input type="radio" name="pay" value="${k}" ${payMethod===k?'checked':''} data-pay="${k}"></label>`).join('')}</fieldset>
+    <button class="cta block gold" data-pay-now="${id}">Pagar ${money(sub+fee,c.cur)}</button>
+    <p class="fine">+${pts} puntos · Pago simulado: es un prototipo, no se cobra nada.</p></div>`;
+}
+function vTicket(tid){
+  const t = S.tickets.find(x=>x.id===tid); if (!t) return vTickets();
+  const e = ev(t.ev), c = city(e.city), fresh = sessionFresh === tid;
+  return `<div class="view">
+    ${fresh?`<div class="success"><div class="ok">${ic('check')}</div><h1>¡Ya estás dentro!</h1><p>Ganaste <b style="color:var(--gold-2)">${t.pts} puntos</b>. Enseña este QR en la puerta.</p></div>`
+      :`<header class="top"><a class="icon-btn" href="#entradas" aria-label="Volver">${ic('back')}</a><span class="logo" style="font-size:20px">Tu entrada</span><span style="width:42px"></span></header>`}
+    <div class="ticket">${photo(e.img,'',800,e.title)}<div class="tl"><span class="badge">${TYPE[e.type]}</span></div></div>
+      <div class="tb"><h2>${esc(e.title)}</h2>
+      <div class="tgrid"><div><span>Fecha</span><b>${dayLabel(e.day)}</b></div><div><span>Hora</span><b>${e.time}</b></div>
+      <div><span>Lugar</span><b>${esc(e.type==='house'?'Dirección enviada':e.venue)}</b></div><div><span>Entradas</span><b>${t.lines.map(l=>`${l.n}× ${l.name}`).join(', ')}</b></div></div></div>
+      <div class="perf"></div>
+      <div class="qr">${qr(t.id)}<span style="font-size:12px;font-weight:700;letter-spacing:2px">${t.id.toUpperCase()}</span></div>
+    </div>
+    <div class="section" style="display:flex;gap:10px">${fresh?`<a class="cta block" href="#entradas" style="flex:1">Mis entradas</a><a class="cta block gold" href="#perfil" style="flex:1">Ver puntos</a>`:''}</div>
+  </div>${fresh?'':nav('entradas')}`;
+}
+function vTickets(){
+  const up = S.tickets.slice().reverse();
+  const favs = EVENTS.filter(e=>S.favs.includes(e.id));
+  return `<div class="view">
+    <header class="top"><span class="logo">Mis <i>entradas</i></span></header>
+    <section class="section">${up.length ? up.map(t=>{ const e = ev(t.ev); return miniRow(e, `${dayLabel(e.day)} · ${t.lines.reduce((s,l)=>s+l.n,0)} entrada(s)`, `#tk-${t.id}`); }).join('') : `<div class="empty"><b>Aún no tienes entradas</b>Cuando compres, tu QR aparece aquí.<div style="margin-top:16px"><a class="cta-sm" href="#inicio">Buscar eventos</a></div></div>`}</section>
+    <section class="section"><div class="sec-head"><h2>Guardados</h2></div>${favs.length ? favs.map(e=>miniRow(e, `${city(e.city).name} · ${dayLabel(e.day)}`, `#ev-${e.id}`)).join('') : `<p style="color:var(--muted);font-size:14px">Toca el corazón en un evento para guardarlo.</p>`}</section>
+  </div>${nav('entradas')}`;
+}
+function vExplore(){
+  const q = query.trim().toLowerCase();
+  const res = q ? EVENTS.filter(e => [e.title,e.venue,e.area,city(e.city).name,TYPE[e.type]].join(' ').toLowerCase().includes(q)) : EVENTS.slice().sort((a,b)=>a.day-b.day);
+  const cs = q ? CITIES.filter(c=>c.name.toLowerCase().includes(q)) : [];
+  return `<div class="view">
+    <label class="sbox">${ic('search')}<span class="sr">Buscar</span><input id="q" type="search" value="${esc(query)}" placeholder="Eventos, clubes, ciudades…" autocomplete="off"></label>
+    <div id="results">${exploreResults(res, cs, q)}</div>
+  </div>${nav('explorar')}`;
+}
+function exploreResults(res, cs, q){
+  return `${cs.length?`<section class="section"><div class="cities">${cs.map(c=>cityTile(c,true)).join('')}</div></section>`:''}
+    <section class="section"><div class="sec-head"><h2>${q?`${res.length} resultado${res.length===1?'':'s'}`:'Próximos eventos'}</h2></div></section>
+    <div class="list" style="padding-top:0">${res.length?res.map(eventCard).join(''):`<div class="empty"><b>Sin resultados</b>Prueba con una ciudad o un tipo de evento.</div>`}</div>`;
+}
+function vProfile(){
+  const L = level(S.earned), pct = L.next ? Math.min(100, (S.earned-L.cur.at)/(L.next.at-L.cur.at)*100) : 100;
+  const spent = S.tickets.length, cities = new Set(S.tickets.map(t=>ev(t.ev).city)).size;
+  return `<div class="view">
+    <div class="prof"><div class="ava">Y</div><div><h1>Yago</h1><p>Nivel ${L.cur.n} · ${esc(city(S.city).name)}</p></div></div>
+    <div class="pts"><span class="eyebrow" style="color:var(--wine-700)">Mis puntos</span><div class="big">${S.points.toLocaleString('es-MX')}</div>
+      <div class="lvl"><span>${L.cur.n}</span><span>${L.next?`${(L.next.at-S.earned).toLocaleString('es-MX')} pts para ${L.next.n}`:'Nivel máximo'}</span></div>
+      <div class="bar"><i style="width:${pct}%"></i></div></div>
+    <div class="stats"><div class="stat"><b>${spent}</b><span>Compras</span></div><div class="stat"><b>${cities}</b><span>Ciudades</span></div><div class="stat"><b>${S.favs.length}</b><span>Guardados</span></div></div>
+    <section class="section"><div class="sec-head"><h2>Canjea tus puntos</h2></div>
+      ${PROMOS.map(p=>{ const code = S.codes[p.id], can = S.points>=p.cost;
+        return `<div class="promo"><div class="ic">${ic(p.icon)}</div><div class="tx"><b>${p.name}</b><span>${p.place} · ${p.cost.toLocaleString('es-MX')} pts</span></div>
+          ${code?`<span class="code">${code}</span>`:`<button class="redeem" data-redeem="${p.id}" ${can?'':'disabled'}>${can?'Canjear':`Faltan ${(p.cost-S.points).toLocaleString('es-MX')}`}</button>`}</div>`; }).join('')}
+    </section>
+    <section class="section"><div class="sec-head"><h2>Cómo ganar puntos</h2></div>
+      <div class="promo"><div class="ic">${ic('ticket')}</div><div class="tx"><b>Compra entradas</b><span>Early bird ${PTS.early} · General ${PTS.general} · VIP ${PTS.vip} pts</span></div></div>
+      <div class="promo"><div class="ic">${ic('people')}</div><div class="tx"><b>Invita amigos</b><span>Pronto: puntos por cada amigo que compre</span></div></div>
+    </section>
+    <section class="section"><button class="chip" data-reset="1" style="width:100%">Reiniciar demo</button><p class="fine">Prototipo con datos de ejemplo · fotos de Unsplash</p></section>
+  </div>${nav('perfil')}`;
+}
+
+/* ============ Router ============ */
+let sessionFresh = null;
+function route(){
+  const h = location.hash.replace('#','') || 'inicio';
+  if (h.startsWith('ev-')) return vEvent(h.slice(3));
+  if (h.startsWith('city-')) return vCity(h.slice(5));
+  if (h.startsWith('tk-')) return vTicket(h.slice(3));
+  return ({inicio:vHome, ciudades:vCities, explorar:vExplore, entradas:vTickets, perfil:vProfile}[h] || vHome)();
+}
+let lastHash = null;
+function render(keepScroll){
+  const sc = window.matchMedia('(min-width:600px)').matches ? $('#scroll') : document.scrollingElement;
+  const y = sc.scrollTop;
+  $('#app').innerHTML = route();
+  $('#layer').innerHTML = sheet ? sheetCheckout(sheet) : '';
+  if (keepScroll) { sc.scrollTop = y; document.querySelectorAll('#app .view').forEach(v=>v.style.animation='none'); }
+  else sc.scrollTop = 0;
+  const q = $('#q'); if (q && !keepScroll) setTimeout(()=>q.focus({preventScroll:true}), 50);
+}
+window.addEventListener('hashchange', () => { if (location.hash !== lastHash){ sheet = null; if(!location.hash.startsWith('#tk-')) sessionFresh = null; lastHash = location.hash; render(false); } });
+
+/* fotos rotas → fondo vino */
+document.addEventListener('error', e => { if (e.target.tagName === 'IMG') e.target.classList.add('broken'); }, true);
+
+document.addEventListener('input', e => {
+  if (e.target.id === 'q'){ query = e.target.value; const q = query.trim().toLowerCase();
+    const res = q ? EVENTS.filter(x => [x.title,x.venue,x.area,city(x.city).name,TYPE[x.type]].join(' ').toLowerCase().includes(q)) : EVENTS.slice().sort((a,b)=>a.day-b.day);
+    $('#results').innerHTML = exploreResults(res, q ? CITIES.filter(c=>c.name.toLowerCase().includes(q)) : [], q); }
+});
+document.addEventListener('change', e => { const p = e.target.dataset && e.target.dataset.pay; if (p) payMethod = p; });
+
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-fav],[data-inc],[data-dec],[data-filter],[data-checkout],[data-close],[data-pay-now],[data-redeem],[data-share],[data-reset]');
+  if (!b) return;
+  const d = b.dataset;
+  if (d.fav){ e.preventDefault(); e.stopPropagation(); const i = S.favs.indexOf(d.fav); i<0 ? S.favs.push(d.fav) : S.favs.splice(i,1); save(); toast(i<0?'Guardado ♥':'Quitado de guardados'); render(true); }
+  else if (d.inc || d.dec){ const [id,k] = (d.inc||d.dec).split(':'); cart[id][k] = Math.max(0, cart[id][k] + (d.inc?1:-1)); render(true); }
+  else if (d.filter){ cityFilter = d.filter; render(true); }
+  else if (d.checkout){ sheet = d.checkout; render(true); }
+  else if (d.close){ sheet = null; render(true); }
+  else if (d.payNow){
+    const id = d.payNow, e2 = ev(id), q = cart[id];
+    const lines = e2.t.filter(t=>q[t.k]).map(t=>({k:t.k, name:t.name, n:q[t.k]}));
+    const pts = lines.reduce((s,l)=>s+l.n*PTS[l.k],0);
+    lines.forEach(l => { const t = e2.t.find(x=>x.k===l.k); t.left = Math.max(0, t.left-l.n); });
+    const tid = 'wp' + Math.random().toString(36).slice(2,8);
+    S.tickets.push({id:tid, ev:id, lines, pts}); S.points += pts; S.earned += pts; save();
+    cart[id] = {early:0,general:0,vip:0}; sheet = null; sessionFresh = tid; location.hash = 'tk-'+tid;
+  }
+  else if (d.redeem){ const p = PROMOS.find(x=>x.id===d.redeem); if (S.points>=p.cost){ S.points -= p.cost; S.codes[p.id] = 'WP-' + Math.random().toString(36).slice(2,7).toUpperCase(); save(); toast(`Canjeado: ${p.name}`); render(true); } }
+  else if (d.share){ const url = location.href; (navigator.clipboard ? navigator.clipboard.writeText(url) : Promise.reject()).then(()=>toast('Enlace copiado'), ()=>toast('Comparte este enlace: ' + location.hash)); }
+  else if (d.reset){ S = JSON.parse(JSON.stringify(DEF)); save(); toast('Demo reiniciada'); render(true); }
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && sheet){ sheet = null; render(true); } });
+
+lastHash = location.hash; render(false);
+</script>
+</body>
+</html>
