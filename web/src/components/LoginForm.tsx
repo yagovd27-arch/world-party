@@ -1,7 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { supabaseBrowser } from "@/lib/supabase/client";
+import { supabaseBrowser, supabaseMailer } from "@/lib/supabase/client";
 
 /** Entrar con el email: te llega un enlace (o un código). Sin contraseñas. */
 export default function LoginForm({ next, cta = "Entrar con email" }: { next: string; cta?: string }) {
@@ -18,7 +18,7 @@ export default function LoginForm({ next, cta = "Entrar con email" }: { next: st
     setErr("");
     if (!/^\S+@\S+\.\S+$/.test(email.trim())) return setErr("Escribe un email válido.");
     setBusy(true);
-    const { error } = await supabaseBrowser().auth.signInWithOtp({
+    const { error } = await supabaseMailer().auth.signInWithOtp({
       email: email.trim(),
       options: { shouldCreateUser: true, emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}` },
     });
