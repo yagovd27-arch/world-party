@@ -199,6 +199,16 @@ create policy "admins see admins" on platform_admins for select using (user_id =
 
 -- Los pedidos y entradas los crea el servidor con la clave de servicio (no hay políticas de insert públicas).
 
+-- Permisos de la API (RLS decide qué filas ve cada uno)
+grant usage on schema public to anon, authenticated, service_role;
+grant select on cities, clubs, events, ticket_types to anon;
+grant select, insert, update, delete on all tables in schema public to authenticated;
+grant all on all tables in schema public to service_role;
+revoke execute on function confirm_order(uuid, text) from public, anon, authenticated;
+grant execute on function confirm_order(uuid, text) to service_role;
+grant execute on function is_club_member(uuid) to anon, authenticated;
+grant execute on function scan_ticket(text) to authenticated;
+
 -- Fotos de los eventos (bucket público)
 insert into storage.buckets (id, name, public) values ('event-images', 'event-images', true)
   on conflict (id) do nothing;
