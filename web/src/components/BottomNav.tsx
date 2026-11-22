@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 const items = [
   { href: "/", label: "Eventos", icon: "M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1Z" },
   { href: "/entradas", label: "Entradas", icon: "M3 8a2 2 0 0 0 2-2h14a2 2 0 0 0 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 0-2 2H5a2 2 0 0 0-2-2v-2a2 2 0 0 0 0-4Z" },
-  { href: "/club", label: "Clubs", icon: "M4 21V9l8-6 8 6v12M9 21v-6h6v6" },
+  { href: "/perfil", label: "Perfil", icon: "M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm-7 9a7 7 0 0 1 14 0" },
 ];
 
 export default function BottomNav() {

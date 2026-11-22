@@ -4,21 +4,24 @@ import QRCode from "qrcode";
 import { useEffect, useState } from "react";
 import { getLocalOrders, getOrderRefs, type LocalOrder, type OrderRef } from "@/lib/local-orders";
 
-export default function MyTickets() {
+export default function MyTickets({ hideIds, hasAccountOrders }: { hideIds: string[]; hasAccountOrders: boolean }) {
   const [refs, setRefs] = useState<OrderRef[] | null>(null);
   const [local, setLocal] = useState<LocalOrder[]>([]);
   const [qrs, setQrs] = useState<Record<string, string>>({});
 
+  const hideKey = hideIds.join(",");
   useEffect(() => {
+    const hidden = hideKey.split(",");
     const l = getLocalOrders();
-    setRefs(getOrderRefs());
+    setRefs(getOrderRefs().filter((r) => !hidden.includes(r.id)));
     setLocal(l);
     Promise.all(l.flatMap((o) => o.codes).map(async (c) => [c, await QRCode.toDataURL(c, { margin: 1, width: 400, color: { dark: "#19050b", light: "#f5ebda" } })] as const))
       .then((pairs) => setQrs(Object.fromEntries(pairs)));
-  }, []);
+  }, [hideKey]);
 
   if (refs === null) return null;
   if (!refs.length && !local.length) {
+    if (hasAccountOrders) return null;
     return (
       <div className="list">
         <div className="empty"><b>Aún no tienes entradas</b>Cuando compres, tu QR aparece aquí.
@@ -34,7 +37,7 @@ export default function MyTickets() {
         <div className="list">
           {refs.map((r, i) => (
             <Link key={r.id} href={`/t/${r.id}?k=${r.key}`} className="card" style={{ display: "flex", justifyContent: "space-between" }}>
-              <span>Pedido {i + 1}</span><span className="scarce">Ver QR →</span>
+              <span>Entradas compradas en este móvil · {i + 1}</span><span className="scarce">Ver QR →</span>
             </Link>
           ))}
         </div>

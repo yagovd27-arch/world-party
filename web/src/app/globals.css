@@ -154,3 +154,16 @@ table.t th { font-size: 12px; color: var(--muted); font-weight: 600; }
 .scan-result { border-radius: 16px; padding: 22px; text-align: center; font-weight: 800; font-size: 20px; margin-top: 14px; }
 .scan-result.ok { background: #1f4d36; color: #c9f2db; }
 .scan-result.bad { background: #5a1c1c; color: #ffd6d6; }
+.club-area { padding-bottom: 60px; }
+.st { display: inline-block; font-size: 11.5px; font-weight: 700; border-radius: 6px; padding: 3px 8px; margin-top: 4px; }
+.st-published { background: rgba(127, 200, 160, 0.16); color: var(--ok); }
+.st-draft { background: rgba(201, 164, 108, 0.16); color: var(--gold-2); }
+.st-cancelled { background: rgba(232, 138, 138, 0.16); color: var(--bad); }
+.pill.gold { background: var(--gold); color: var(--wine-950); border-color: var(--gold); }
+.actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.actions form { flex: 1 1 180px; }
+.upload { display: flex; align-items: flex-end; justify-content: flex-start; height: 190px; border-radius: var(--r-lg); padding: 12px; cursor: pointer; border: 1px dashed var(--line); background-size: cover; background-position: center; }
+.scanbox { position: relative; aspect-ratio: 1; border-radius: 18px; overflow: hidden; background: var(--wine-950); border: 1px solid var(--line); display: flex; align-items: center; justify-content: center; }
+.scanbox video { width: 100%; height: 100%; object-fit: cover; }
+.scanframe { position: absolute; inset: 18%; border: 3px solid var(--cream); border-radius: 18px; box-shadow: 0 0 0 999px rgba(17, 3, 8, 0.35); }
+.stat small { font-size: 13px; font-weight: 600; }

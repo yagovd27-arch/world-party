@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import CheckoutForm from "./CheckoutForm";
+import { getUser } from "@/lib/auth";
 import { getCity, getEvent } from "@/lib/data";
 import { dayLabel, money, parts, serviceFee, tzFor } from "@/lib/format";
 import { SERVICE_FEE_RATE } from "@/lib/types";
@@ -23,6 +24,7 @@ export default async function Checkout({ searchParams }: PageProps<"/checkout">)
   const subtotal = lines.reduce((s, l) => s + l.qty * l.t.price, 0);
   const fee = serviceFee(subtotal, SERVICE_FEE_RATE);
   const tz = tzFor(e.city_id);
+  const user = await getUser();
 
   return (
     <main className="shell">
@@ -43,7 +45,7 @@ export default async function Checkout({ searchParams }: PageProps<"/checkout">)
           <div className="sum"><span>Cargo por servicio</span><span>{money(fee, city.currency_symbol)}</span></div>
           <div className="sum total"><span>Total</span><span>{money(subtotal + fee, city.currency_symbol)}</span></div>
         </div>
-        <CheckoutForm eventId={e.id} items={lines.map(({ t, qty }) => ({ id: t.id, qty }))} totalLabel={money(subtotal + fee, city.currency_symbol)} />
+        <CheckoutForm eventId={e.id} items={lines.map(({ t, qty }) => ({ id: t.id, qty }))} totalLabel={money(subtotal + fee, city.currency_symbol)} defaultEmail={user?.email ?? ""} />
       </section>
     </main>
   );

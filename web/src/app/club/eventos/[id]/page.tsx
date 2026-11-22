@@ -1,0 +1,128 @@
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { requireClub } from "@/lib/auth";
+import { getCity } from "@/lib/data";
+import { dayLabel, money, parts, tzFor } from "@/lib/format";
+import { supabaseServer } from "@/lib/supabase/server";
+import { setEventStatus } from "../../actions";
+import ClubTop from "../../_ui/ClubTop";
+
+export const metadata = { title: "Evento" };
+
+type Ev = {
+  id: string; title: string; starts_at: string; status: string; city_id: string; image_url: string | null;
+  ticket_types: { id: string; name: string; price: number; sold: number; capacity: number; sort: number }[];
+};
+type Order = {
+  id: string; buyer_name: string; buyer_email: string; buyer_phone: string | null; subtotal: number; created_at: string;
+  order_items: { qty: number; ticket_type: { name: string } }[];
+  tickets: { scanned_at: string | null }[];
+};
+
+const STATUS: Record<string, string> = { draft: "Borrador", published: "Publicado", cancelled: "Cancelado" };
+
+export default async function ClubEvent({ params, searchParams }: PageProps<"/club/eventos/[id]">) {
+  const { id } = await params;
+  const sp = await searchParams;
+  const { admin } = await requireClub();
+  if (!/^[0-9a-f-]{36}$/i.test(id)) notFound();
+
+  const sb = await supabaseServer();
+  const [{ data: ev }, { data: ord }] = await Promise.all([
+    sb.from("events").select("id, title, starts_at, status, city_id, image_url, ticket_types(id, name, price, sold, capacity, sort)").eq("id", id).maybeSingle(),
+    sb.from("orders")
+      .select("id, buyer_name, buyer_email, buyer_phone, subtotal, created_at, order_items(qty, ticket_type:ticket_types(name)), tickets(scanned_at)")
+      .eq("event_id", id).eq("status", "paid").order("created_at", { ascending: false }).limit(500),
+  ]);
+  if (!ev) notFound();
+  const e = ev as Ev;
+  const orders = (ord as unknown as Order[]) ?? [];
+  const city = await getCity(e.city_id);
+  const sym = city?.currency_symbol ?? "";
+  const tz = tzFor(e.city_id);
+  const tiers = [...e.ticket_types].sort((a, b) => a.sort - b.sort);
+  const sold = tiers.reduce((s, t) => s + t.sold, 0);
+  const cap = tiers.reduce((s, t) => s + t.capacity, 0);
+  const revenue = tiers.reduce((s, t) => s + t.sold * t.price, 0);
+  const tickets = orders.flatMap((o) => o.tickets);
+  const inside = tickets.filter((t) => t.scanned_at).length;
+  const note = typeof sp.n === "string" ? sp.n : "";
+  const err = typeof sp.e === "string" ? sp.e : "";
+
+  const statusBtn = (status: string, label: string, ghost = true) => (
+    <form action={setEventStatus}>
+      <input type="hidden" name="id" value={e.id} />
+      <input type="hidden" name="status" value={status} />
+      <button className={`cta${ghost ? " ghost" : ""} block`}>{label}</button>
+    </form>
+  );
+
+  return (
+    <>
+      <ClubTop active="panel" admin={admin} />
+      <section className="section">
+        <Link href="/club" className="fine">← Eventos</Link>
+        <div style={{ display: "flex", gap: 16, alignItems: "center", marginTop: 10 }}>
+          <div className="ph" style={{ width: 84, height: 104, borderRadius: 10, flexShrink: 0, backgroundImage: e.image_url ? `url(${e.image_url})` : undefined, backgroundSize: "cover", backgroundPosition: "center" }} />
+          <div style={{ minWidth: 0 }}>
+            <span className={`st st-${e.status}`}>{STATUS[e.status]}</span>
+            <h1 style={{ fontSize: 24, fontWeight: 800, lineHeight: 1.15, marginTop: 6 }}>{e.title}</h1>
+            <span className="fine">{dayLabel(e.starts_at, tz)} · {parts(e.starts_at, tz).time} h</span>
+          </div>
+        </div>
+        {note && <p className="notice">{note}</p>}
+        {err && <p className="error">{err}</p>}
+
+        <div className="stats" style={{ marginTop: 18 }}>
+          <div className="stat"><b>{sold}<small className="fine">/{cap}</small></b><span>Vendidas</span></div>
+          <div className="stat"><b>{money(revenue, sym)}</b><span>Para el club</span></div>
+          <div className="stat"><b>{inside}</b><span>Han entrado</span></div>
+        </div>
+
+        <div className="actions">
+          <Link href={`/club/eventos/${e.id}/editar`} className="cta">Editar</Link>
+          {e.status === "published" && <Link href={`/e/${e.id}`} className="cta ghost" target="_blank">Ver página pública</Link>}
+          <Link href="/club/scan" className="cta ghost">Escanear QR</Link>
+        </div>
+      </section>
+
+      <h2 className="ghead">Entradas</h2>
+      <div className="section" style={{ paddingTop: 10 }}>
+        <table className="t">
+          <thead><tr><th>Tipo</th><th>Precio</th><th>Vendidas</th><th>Ingresos</th></tr></thead>
+          <tbody>
+            {tiers.map((t) => (
+              <tr key={t.id}><td>{t.name}</td><td>{money(t.price, sym)}</td><td>{t.sold}/{t.capacity}</td><td>{money(t.sold * t.price, sym)}</td></tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <h2 className="ghead">Compradores ({orders.length})</h2>
+      <div className="section" style={{ paddingTop: 10, overflowX: "auto" }}>
+        {orders.length ? (
+          <table className="t">
+            <thead><tr><th>Nombre</th><th>Entradas</th><th>Contacto</th><th>Dentro</th></tr></thead>
+            <tbody>
+              {orders.map((o) => (
+                <tr key={o.id}>
+                  <td>{o.buyer_name}</td>
+                  <td>{o.order_items.map((i) => `${i.qty}× ${i.ticket_type.name}`).join(", ")}</td>
+                  <td className="fine">{o.buyer_email}{o.buyer_phone ? <><br />{o.buyer_phone}</> : null}</td>
+                  <td>{o.tickets.filter((t) => t.scanned_at).length}/{o.tickets.length}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : <div className="empty"><b>Aún no hay ventas</b>Comparte el link del evento en tu Instagram.</div>}
+      </div>
+
+      <div className="section actions" style={{ paddingBottom: 30 }}>
+        {e.status === "draft" && statusBtn("published", "Publicar", false)}
+        {e.status === "published" && statusBtn("draft", "Despublicar")}
+        {e.status === "cancelled" && statusBtn("draft", "Recuperar como borrador")}
+        {e.status !== "cancelled" && sold === 0 && statusBtn("cancelled", "Cancelar evento")}
+      </div>
+    </>
+  );
+}

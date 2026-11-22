@@ -67,3 +67,22 @@ export function money(n: number, symbol: string) {
 export function serviceFee(subtotal: number, rate: number) {
   return Math.round(subtotal * rate);
 }
+
+/** "2026-12-13T22:00" en la hora de la ciudad → ISO en UTC. */
+export function zonedToUtc(local: string, tz: string) {
+  const guess = Date.parse(local.length === 16 ? local + ":00Z" : local + "Z");
+  if (Number.isNaN(guess)) return null;
+  const offset = (ts: number) => {
+    const p = parts(new Date(ts), tz);
+    return Date.parse(`${p.ymd}T${p.time}:00Z`) - Math.floor(ts / 60000) * 60000;
+  };
+  let ts = guess - offset(guess);
+  ts = guess - offset(ts);
+  return new Date(ts).toISOString();
+}
+
+/** ISO en UTC → valor para <input type="datetime-local"> en la hora de la ciudad. */
+export function utcToLocalInput(iso: string, tz: string) {
+  const p = parts(iso, tz);
+  return `${p.ymd}T${p.time}`;
+}

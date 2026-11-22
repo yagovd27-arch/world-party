@@ -21,10 +21,10 @@ function loadRazorpay(): Promise<boolean> {
   });
 }
 
-export default function CheckoutForm({ eventId, items, totalLabel }: { eventId: string; items: { id: string; qty: number }[]; totalLabel: string }) {
+export default function CheckoutForm({ eventId, items, totalLabel, defaultEmail }: { eventId: string; items: { id: string; qty: number }[]; totalLabel: string; defaultEmail: string }) {
   const router = useRouter();
   const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(defaultEmail);
   const [phone, setPhone] = useState("");
   const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);
