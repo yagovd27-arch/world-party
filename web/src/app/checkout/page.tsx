@@ -5,6 +5,7 @@ import { getUser } from "@/lib/auth";
 import { getCity, getEvent } from "@/lib/data";
 import { dayLabel, money, parts, serviceFee, tzFor } from "@/lib/format";
 import { SERVICE_FEE_RATE } from "@/lib/types";
+import { getT } from "@/lib/lang";
 
 export default async function Checkout({ searchParams }: PageProps<"/checkout">) {
   const sp = await searchParams;
@@ -25,25 +26,26 @@ export default async function Checkout({ searchParams }: PageProps<"/checkout">)
   const fee = serviceFee(subtotal, SERVICE_FEE_RATE);
   const tz = tzFor(e.city_id);
   const user = await getUser();
+  const { lang, t } = await getT();
 
   return (
     <main className="shell">
       <header className="top">
-        <Link className="icon-btn" href={`/e/${e.id}`} aria-label="Volver">
+        <Link className="icon-btn" href={`/e/${e.id}`} aria-label={t.back}>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><path d="m15 18-6-6 6-6" /></svg>
         </Link>
-        <span className="logo" style={{ fontSize: 20 }}>Pagar</span>
+        <span className="logo" style={{ fontSize: 20 }}>{t.pay}</span>
         <span style={{ width: 42 }} />
       </header>
       <section className="section">
         <div className="card">
-          <span className="fine">{dayLabel(e.starts_at, tz)} · {parts(e.starts_at, tz).time} h · {e.club.name}</span>
+          <span className="fine">{dayLabel(e.starts_at, tz, lang)} · {t.hour(parts(e.starts_at, tz).time)} · {e.club.name}</span>
           <h2 style={{ fontSize: 20, fontWeight: 800, margin: "4px 0 10px" }}>{e.title}</h2>
           {lines.map(({ t, qty }) => (
             <div className="sum" key={t.id}><span>{qty} × {t.name}</span><span>{money(qty * t.price, city.currency_symbol)}</span></div>
           ))}
-          <div className="sum"><span>Cargo por servicio</span><span>{money(fee, city.currency_symbol)}</span></div>
-          <div className="sum total"><span>Total</span><span>{money(subtotal + fee, city.currency_symbol)}</span></div>
+          <div className="sum"><span>{t.serviceFee}</span><span>{money(fee, city.currency_symbol)}</span></div>
+          <div className="sum total"><span>{t.total}</span><span>{money(subtotal + fee, city.currency_symbol)}</span></div>
         </div>
         <CheckoutForm eventId={e.id} items={lines.map(({ t, qty }) => ({ id: t.id, qty }))} totalLabel={money(subtotal + fee, city.currency_symbol)} defaultEmail={user?.email ?? ""} />
       </section>

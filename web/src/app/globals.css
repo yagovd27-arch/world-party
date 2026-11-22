@@ -261,3 +261,8 @@ table.t th { font-size: 12px; color: var(--muted); font-weight: 600; }
 .place-tx span { display: block; font-size: 13px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .place-go { font-size: 13px; font-weight: 600; color: var(--gold-2); white-space: nowrap; }
 
+
+/* Idioma */
+.topright { display: flex; align-items: center; gap: 14px; }
+.langsw { font-size: 12px; font-weight: 700; letter-spacing: 0.04em; color: var(--muted); border: 1px solid var(--line); border-radius: var(--r-md); padding: 5px 8px; }
+.langsw:hover { color: var(--cream); border-color: var(--cream-2); }

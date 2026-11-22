@@ -4,6 +4,7 @@ import { parts, serviceFee, shortDate, tzFor } from "@/lib/format";
 import { createRazorpayOrder, demoPayments, razorpayKeyId, razorpayOn } from "@/lib/payments";
 import { isSupabaseOn, supabaseAdmin } from "@/lib/supabase/server";
 import { SERVICE_FEE_RATE, type EventItem } from "@/lib/types";
+import { getT } from "@/lib/lang";
 
 type Body = {
   eventId?: string;
@@ -15,26 +16,28 @@ const bad = (error: string, status = 400) => NextResponse.json({ error }, { stat
 const code = () => crypto.randomUUID().replace(/-/g, "").slice(0, 10).toUpperCase();
 
 export async function POST(req: Request) {
+  const { lang, t } = await getT();
+  const m = t.api;
   let body: Body;
-  try { body = await req.json(); } catch { return bad("Pedido no válido."); }
+  try { body = await req.json(); } catch { return bad(m.badOrder); }
   const { eventId, items, buyer } = body;
-  if (!eventId || !Array.isArray(items) || !items.length) return bad("Faltan las entradas.");
-  if (!buyer?.name || !buyer.email || !/^\S+@\S+\.\S+$/.test(buyer.email)) return bad("Faltan tus datos.");
-  if (items.some((i) => !Number.isInteger(i.qty) || i.qty < 1 || i.qty > 10)) return bad("Cantidad no válida.");
+  if (!eventId || !Array.isArray(items) || !items.length) return bad(m.noItems);
+  if (!buyer?.name || !buyer.email || !/^\S+@\S+\.\S+$/.test(buyer.email)) return bad(m.noBuyer);
+  if (items.some((i) => !Number.isInteger(i.qty) || i.qty < 1 || i.qty > 10)) return bad(m.badQty);
 
   // Sin base de datos: compra simulada que se guarda en el móvil.
   if (!isSupabaseOn) {
     const e = DEMO_EVENTS.find((x) => x.id === eventId);
-    if (!e) return bad("Evento no encontrado.", 404);
+    if (!e) return bad(m.noEvent, 404);
     const city = DEMO_CITIES.find((c) => c.id === e.city_id)!;
     const tz = tzFor(e.city_id);
     const lines = items.map((i) => ({ t: e.ticket_types.find((t) => t.id === i.id), qty: i.qty }));
-    if (lines.some((l) => !l.t)) return bad("Tipo de entrada no válido.");
+    if (lines.some((l) => !l.t)) return bad(m.badTier);
     return NextResponse.json({
       mode: "local",
       order: {
         id: crypto.randomUUID(),
-        event: { id: e.id, title: e.title, starts: `${shortDate(e.starts_at, tz)} · ${parts(e.starts_at, tz).time} h`, venue: e.club.name, city: city.name },
+        event: { id: e.id, title: e.title, starts: `${shortDate(e.starts_at, tz, lang)} · ${t.hour(parts(e.starts_at, tz).time)}`, venue: e.club.name, city: city.name },
         lines: lines.map((l) => ({ name: l.t!.name, qty: l.qty })),
         codes: lines.flatMap((l) => Array.from({ length: l.qty }, code)),
       },
@@ -47,16 +50,16 @@ export async function POST(req: Request) {
     .select("id, title, status, starts_at, city_id, ticket_types(*), city:cities(currency)")
     .eq("id", eventId)
     .maybeSingle();
-  if (evErr || !ev || ev.status !== "published") return bad("Este evento no está a la venta.", 404);
+  if (evErr || !ev || ev.status !== "published") return bad(m.notOnSale, 404);
   const event = ev as unknown as EventItem & { city: { currency: string } };
-  if (new Date(event.starts_at).getTime() < Date.now() - 4 * 3600e3) return bad("Este evento ya pasó.");
+  if (new Date(event.starts_at).getTime() < Date.now() - 4 * 3600e3) return bad(m.past);
 
   const lines = [];
   for (const i of items) {
     const t = event.ticket_types.find((x) => x.id === i.id);
-    if (!t) return bad("Tipo de entrada no válido.");
-    if (t.sales_end && new Date(t.sales_end).getTime() < Date.now()) return bad(`${t.name}: la venta ya terminó.`);
-    if (t.sold + i.qty > t.capacity) return bad(`${t.name}: no quedan suficientes entradas.`);
+    if (!t) return bad(m.badTier);
+    if (t.sales_end && new Date(t.sales_end).getTime() < Date.now()) return bad(m.salesEnded(t.name));
+    if (t.sold + i.qty > t.capacity) return bad(m.notEnough(t.name));
     lines.push({ t, qty: i.qty });
   }
   const subtotal = lines.reduce((s, l) => s + l.qty * l.t.price, 0);
@@ -64,7 +67,7 @@ export async function POST(req: Request) {
   const total = subtotal + fee;
   const currency = event.city.currency;
 
-  if (!razorpayOn && !demoPayments) return bad("Los pagos todavía no están activados.", 503);
+  if (!razorpayOn && !demoPayments) return bad(m.paymentsOff, 503);
 
   const { data: order, error: oErr } = await sb
     .from("orders")
@@ -74,7 +77,7 @@ export async function POST(req: Request) {
     })
     .select("id, access_key")
     .single();
-  if (oErr || !order) return bad("No se pudo crear el pedido.", 500);
+  if (oErr || !order) return bad(m.createFailed, 500);
   await sb.from("order_items").insert(lines.map((l) => ({ order_id: order.id, ticket_type_id: l.t.id, qty: l.qty, unit_price: l.t.price })));
 
   if (razorpayOn) {
@@ -87,14 +90,14 @@ export async function POST(req: Request) {
       });
     } catch {
       await sb.from("orders").update({ status: "failed" }).eq("id", order.id);
-      return bad("La pasarela de pago no respondió. Inténtalo de nuevo.", 502);
+      return bad(m.gatewayDown, 502);
     }
   }
 
   const { error: cErr } = await sb.rpc("confirm_order", { oid: order.id, provider_payment: "demo" });
   if (cErr) {
     await sb.from("orders").update({ status: "failed" }).eq("id", order.id);
-    return bad(cErr.message.includes("sold_out") ? "Se agotaron mientras comprabas." : "No se pudo confirmar.", 409);
+    return bad(cErr.message.includes("sold_out") ? m.soldOutWhile : m.confirmFailed, 409);
   }
   return NextResponse.json({ mode: "paid", orderId: order.id, accessKey: order.access_key });
 }

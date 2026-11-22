@@ -1,8 +1,10 @@
 "use client";
 import { useFormStatus } from "react-dom";
+import { useT } from "./LangProvider";
 
 /** Botón de formulario que muestra "…" mientras se envía. */
-export default function SubmitButton({ children, pendingText = "Guardando…", className = "cta block" }: { children: React.ReactNode; pendingText?: string; className?: string }) {
+export default function SubmitButton({ children, pendingText, className = "cta block" }: { children: React.ReactNode; pendingText?: string; className?: string }) {
   const { pending } = useFormStatus();
-  return <button className={className} disabled={pending}>{pending ? pendingText : children}</button>;
+  const t = useT();
+  return <button className={className} disabled={pending}>{pending ? pendingText ?? t.club.saving : children}</button>;
 }

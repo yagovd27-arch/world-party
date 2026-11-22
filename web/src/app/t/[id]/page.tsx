@@ -4,6 +4,7 @@ import QRCode from "qrcode";
 import BottomNav from "@/components/BottomNav";
 import { parts, shortDate, tzFor } from "@/lib/format";
 import { isSupabaseOn, supabaseAdmin } from "@/lib/supabase/server";
+import { getT } from "@/lib/lang";
 
 type Row = {
   id: string; status: string; buyer_name: string;
@@ -26,40 +27,41 @@ export default async function TicketPage({ params, searchParams }: PageProps<"/t
   if (!data) notFound();
   const o = data as unknown as Row;
   const tz = tzFor(o.event.city_id);
+  const { lang, t } = await getT();
   const qrs = await Promise.all(o.tickets.map((t) => QRCode.toDataURL(t.code, { margin: 1, width: 400, color: { dark: "#19050b", light: "#f5ebda" } })));
 
   return (
     <main className="shell">
       {sp.nuevo ? (
         <div className="section" style={{ textAlign: "center" }}>
-          <h1 style={{ fontSize: 28, fontWeight: 800 }}>¡Ya estás dentro!</h1>
-          <p className="muted" style={{ marginTop: 6 }}>Enseña este QR en la puerta. También lo tienes en “Entradas”.</p>
+          <h1 style={{ fontSize: 28, fontWeight: 800 }}>{t.youreIn}</h1>
+          <p className="muted" style={{ marginTop: 6 }}>{t.showQr}</p>
         </div>
       ) : (
-        <header className="top"><Link href="/entradas" className="pill">← Mis entradas</Link></header>
+        <header className="top"><Link href="/entradas" className="pill">{t.myTicketsBack}</Link></header>
       )}
-      {o.status !== "paid" && <p className="section error">Este pedido no está pagado ({o.status}).</p>}
-      {o.tickets.map((t, i) => (
-        <div className="ticket" key={t.code}>
+      {o.status !== "paid" && <p className="section error">{t.notPaid(o.status)}</p>}
+      {o.tickets.map((tk, i) => (
+        <div className="ticket" key={tk.code}>
           <div className="tb">
             <h2>{o.event.title}</h2>
             <div className="tgrid">
-              <div><span>Fecha</span><b>{shortDate(o.event.starts_at, tz)}</b></div>
-              <div><span>Hora</span><b>{parts(o.event.starts_at, tz).time} h</b></div>
-              <div><span>Lugar</span><b>{o.event.club.name}</b></div>
-              <div><span>Entrada</span><b>{t.ticket_type.name} · {i + 1}/{o.tickets.length}</b></div>
+              <div><span>{t.date}</span><b>{shortDate(o.event.starts_at, tz, lang)}</b></div>
+              <div><span>{t.time}</span><b>{t.hour(parts(o.event.starts_at, tz).time)}</b></div>
+              <div><span>{t.venue}</span><b>{o.event.club.name}</b></div>
+              <div><span>{t.ticket}</span><b>{tk.ticket_type.name} · {i + 1}/{o.tickets.length}</b></div>
             </div>
           </div>
           <div className="perf" />
           <div className="qr">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={qrs[i]} alt={`Código QR ${t.code}`} />
-            <code>{t.code}</code>
-            {t.scanned_at && <span className="used">Ya usada</span>}
+            <img src={qrs[i]} alt={t.qrAlt(tk.code)} />
+            <code>{tk.code}</code>
+            {tk.scanned_at && <span className="used">{t.used}</span>}
           </div>
         </div>
       ))}
-      <p className="fine section" style={{ textAlign: "center" }}>A nombre de {o.buyer_name}. Cada QR vale para una persona y una sola entrada.</p>
+      <p className="fine section" style={{ textAlign: "center" }}>{t.inNameOf(o.buyer_name)}</p>
       <BottomNav />
     </main>
   );

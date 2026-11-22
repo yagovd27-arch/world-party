@@ -1,6 +1,4 @@
-const WD = ["dom", "lun", "mar", "mié", "jue", "vie", "sáb"];
-const MO = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
-export const MONTHS = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
+import { dict, type Lang } from "./i18n";
 
 /** Todas las fechas se muestran en la zona horaria de la ciudad del evento. */
 export const CITY_TZ: Record<string, string> = {
@@ -43,21 +41,23 @@ export function dayOffset(iso: string, tz: string) {
   return Math.round((Date.parse(b + "T00:00:00Z") - Date.parse(a + "T00:00:00Z")) / 864e5);
 }
 
-export function shortDate(iso: string, tz: string) {
+export function shortDate(iso: string, tz: string, lang: Lang) {
   const p = parts(iso, tz);
-  return `${WD[p.weekday]} ${p.day} ${MO[p.month]}`;
+  const t = dict(lang);
+  return `${t.wd[p.weekday]} ${p.day} ${t.mo[p.month]}`;
 }
 
-export function dayLabel(iso: string, tz: string) {
+export function dayLabel(iso: string, tz: string, lang: Lang) {
   const off = dayOffset(iso, tz);
-  const s = shortDate(iso, tz);
-  if (off === 0) return `Hoy · ${s}`;
-  if (off === 1) return `Mañana · ${s}`;
+  const s = shortDate(iso, tz, lang);
+  const t = dict(lang);
+  if (off === 0) return `${t.today} · ${s}`;
+  if (off === 1) return `${t.tomorrow} · ${s}`;
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
-export function weekdayShort(d: Date, tz: string) {
-  return WD[parts(d, tz).weekday];
+export function weekdayShort(d: Date, tz: string, lang: Lang) {
+  return dict(lang).wd[parts(d, tz).weekday];
 }
 
 export function money(n: number, symbol: string) {
@@ -86,4 +86,3 @@ export function utcToLocalInput(iso: string, tz: string) {
   const p = parts(iso, tz);
   return `${p.ymd}T${p.time}`;
 }
-export const WEEKDAYS_LONG = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];

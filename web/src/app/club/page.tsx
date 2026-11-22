@@ -8,35 +8,41 @@ import { dayLabel, money, parts, tzFor } from "@/lib/format";
 import { isSupabaseOn, supabaseServer } from "@/lib/supabase/server";
 import { createClub, switchClub } from "./actions";
 import ClubTop from "./_ui/ClubTop";
+import { cityName } from "@/lib/i18n";
+import { getT } from "@/lib/lang";
 
-export const metadata = { title: { absolute: "la nit for clubs" }, description: "Vende las entradas de tu club gratis y escanea los QR en la puerta." };
+export async function generateMetadata() {
+  const { t } = await getT();
+  return { title: { absolute: "la nit for clubs" }, description: t.club.metaDesc };
+}
 
 type Ev = {
   id: string; title: string; starts_at: string; status: string; city_id: string;
   ticket_types: { price: number; sold: number; capacity: number }[];
 };
 
-const STATUS: Record<string, string> = { draft: "Borrador", published: "Publicado", cancelled: "Cancelado" };
 
 export default async function ClubHome({ searchParams }: PageProps<"/club">) {
   const sp = await searchParams;
   const err = typeof sp.e === "string" ? sp.e : "";
   const user = await getUser();
+  const { lang, t } = await getT();
+  const c = t.club;
 
   if (!user) {
     return (
       <>
         <ClubTop loggedIn={false} />
         <section className="section" style={{ maxWidth: 520 }}>
-          <h1 style={{ fontFamily: "var(--display)", fontSize: 48, fontWeight: 500, lineHeight: 1, letterSpacing: 0 }}>Vende tus entradas sin pagar nada</h1>
-          <p className="desc">Publica tu evento en tres minutos y compártelo en Instagram. El dinero de cada entrada es para el club.</p>
+          <h1 style={{ fontFamily: "var(--display)", fontSize: 48, fontWeight: 500, lineHeight: 1, letterSpacing: 0 }}>{c.heroTitle}</h1>
+          <p className="desc">{c.heroDesc}</p>
           <dl className="facts" style={{ margin: "22px 0 26px" }}>
-            <div><dt>Ventas</dt><dd>Las ves en tiempo real, entrada a entrada.</dd></div>
-            <div><dt>Entradas</dt><dd>Early bird, general y VIP, cada una con su precio y su cupo.</dd></div>
-            <div><dt>Puerta</dt><dd>Escaneas los QR con el móvil. Cada entrada vale una sola vez.</dd></div>
-            <div><dt>Coste</dt><dd>Cero para el club. El comprador paga un cargo de servicio.</dd></div>
+            <div><dt>{c.fSales}</dt><dd>{c.fSalesD}</dd></div>
+            <div><dt>{c.fTickets}</dt><dd>{c.fTicketsD}</dd></div>
+            <div><dt>{c.fDoor}</dt><dd>{c.fDoorD}</dd></div>
+            <div><dt>{c.fCost}</dt><dd>{c.fCostD}</dd></div>
           </dl>
-          {isSupabaseOn ? <LoginForm next="/club" cta="Entrar o registrar mi club" /> : <p className="notice">El panel se activa al conectar la base de datos.</p>}
+          {isSupabaseOn ? <LoginForm next="/club" cta={c.loginCta} /> : <p className="notice">{c.noDb}</p>}
         </section>
       </>
     );
@@ -51,27 +57,27 @@ export default async function ClubHome({ searchParams }: PageProps<"/club">) {
       <>
         <ClubTop admin={admin} />
         <section className="section" style={{ maxWidth: 520 }}>
-          <h1 style={{ fontSize: 26, fontWeight: 800 }}>Registra tu club</h1>
-          <p className="muted" style={{ fontSize: 14, margin: "6px 0 18px" }}>También vale si eres organizador o promotor. Revisamos cada club antes de que pueda publicar (normalmente el mismo día).</p>
+          <h1 style={{ fontSize: 26, fontWeight: 800 }}>{c.registerTitle}</h1>
+          <p className="muted" style={{ fontSize: 14, margin: "6px 0 18px" }}>{c.registerSub}</p>
           <form action={createClub}>
-            <div className="field"><label htmlFor="name">Nombre del club u organizador</label><input id="name" name="name" required maxLength={80} placeholder="Bergamo" /></div>
+            <div className="field"><label htmlFor="name">{c.name}</label><input id="name" name="name" required maxLength={80} placeholder="Bergamo" /></div>
             <div className="row2">
               <div className="field">
-                <label htmlFor="city">Ciudad</label>
-                <select id="city" name="city" required defaultValue={cities.find((c) => c.id === "gurugram")?.id ?? cities[0]?.id}>
-                  {cities.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                <label htmlFor="city">{c.city}</label>
+                <select id="city" name="city" required defaultValue={cities.find((x) => x.id === "gurugram")?.id ?? cities[0]?.id}>
+                  {cities.map((x) => <option key={x.id} value={x.id}>{cityName(x, lang)}</option>)}
                 </select>
               </div>
-              <div className="field"><label htmlFor="area">Zona</label><input id="area" name="area" maxLength={80} placeholder="Hauz Khas" /></div>
+              <div className="field"><label htmlFor="area">{c.area}</label><input id="area" name="area" maxLength={80} placeholder="Hauz Khas" /></div>
             </div>
             <div className="row2">
               <div className="field"><label htmlFor="instagram">Instagram</label><input id="instagram" name="instagram" maxLength={60} placeholder="@tuclub" /></div>
               <div className="field"><label htmlFor="phone">WhatsApp</label><input id="phone" name="phone" type="tel" maxLength={30} placeholder="+91 …" /></div>
             </div>
-            <SubmitButton pendingText="Registrando…">Registrar</SubmitButton>
+            <SubmitButton pendingText={c.registering}>{c.register}</SubmitButton>
             {err && <p className="error" role="alert">{err}</p>}
           </form>
-          <p className="fine" style={{ marginTop: 18 }}>Sesión: {user.email}</p>
+          <p className="fine" style={{ marginTop: 18 }}>{c.session}: {user.email}</p>
         </section>
       </>
     );
@@ -86,7 +92,8 @@ export default async function ClubHome({ searchParams }: PageProps<"/club">) {
     .limit(100);
   const events = (data as Ev[]) ?? [];
   const cities = await getCities();
-  const sym = cities.find((c) => c.id === club.city_id)?.currency_symbol ?? "";
+  const clubCity = cities.find((x) => x.id === club.city_id);
+  const sym = clubCity?.currency_symbol ?? "";
   const cutoff = Date.now() - 12 * 3600e3;
   const upcoming = events.filter((e) => Date.parse(e.starts_at) >= cutoff).reverse();
   const past = events.filter((e) => Date.parse(e.starts_at) < cutoff);
@@ -100,13 +107,13 @@ export default async function ClubHome({ searchParams }: PageProps<"/club">) {
     return (
       <Link key={e.id} href={`/club/eventos/${e.id}`} className="card" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
         <span style={{ minWidth: 0 }}>
-          <span className="fine">{dayLabel(e.starts_at, tz)} · {parts(e.starts_at, tz).time} h</span>
+          <span className="fine">{dayLabel(e.starts_at, tz, lang)} · {t.hour(parts(e.starts_at, tz).time)}</span>
           <b style={{ display: "block", fontSize: 16 }}>{e.title}</b>
-          <span className={`st st-${e.status}`}>{STATUS[e.status]}</span>
+          <span className={`st st-${e.status}`}>{c.status[e.status]}</span>
         </span>
         <span style={{ textAlign: "right", flexShrink: 0 }}>
           <b style={{ display: "block" }}>{s}/{cap}</b>
-          <span className="fine">vendidas</span>
+          <span className="fine">{c.sold}</span>
         </span>
       </Link>
     );
@@ -118,35 +125,35 @@ export default async function ClubHome({ searchParams }: PageProps<"/club">) {
       <section className="section">
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", gap: 12, flexWrap: "wrap" }}>
           <div>
-            <span className="fine">{club.area ? `${club.area} · ` : ""}{cities.find((c) => c.id === club.city_id)?.name}</span>
+            <span className="fine">{club.area ? `${club.area} · ` : ""}{clubCity ? cityName(clubCity, lang) : ""}</span>
             <h1 style={{ fontSize: 28, fontWeight: 800 }}>{club.name}</h1>
           </div>
-          <Link href="/club/eventos/nuevo" className="cta">+ Nuevo evento</Link>
+          <Link href="/club/eventos/nuevo" className="cta">{c.newEvent}</Link>
         </div>
         {mine.length > 1 && (
           <form action={switchClub} style={{ display: "flex", gap: 8, marginTop: 12 }}>
             <select name="id" defaultValue={club.id} className="pill" style={{ background: "var(--wine-700)" }}>
-              {mine.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+              {mine.map((x) => <option key={x.id} value={x.id}>{x.name}</option>)}
             </select>
-            <button className="pill">Cambiar</button>
+            <button className="pill">{c.switch}</button>
           </form>
         )}
         {!club.verified && (
-          <p className="notice">Tu club está pendiente de verificación. Ya puedes crear eventos como borrador; en cuanto lo verifiquemos podrás publicarlos.</p>
+          <p className="notice">{c.pending}</p>
         )}
         <div className="stats" style={{ marginTop: 18 }}>
-          <div className="stat"><b>{upcoming.length}</b><span>Próximos eventos</span></div>
-          <div className="stat"><b>{sold}</b><span>Entradas vendidas</span></div>
-          <div className="stat"><b>{money(revenue, sym)}</b><span>Ventas (para el club)</span></div>
+          <div className="stat"><b>{upcoming.length}</b><span>{c.upcomingN}</span></div>
+          <div className="stat"><b>{sold}</b><span>{c.ticketsSold}</span></div>
+          <div className="stat"><b>{money(revenue, sym)}</b><span>{c.salesForClub}</span></div>
         </div>
       </section>
-      <h2 className="ghead">Próximos</h2>
+      <h2 className="ghead">{c.upcoming}</h2>
       <div className="list">
-        {upcoming.length ? upcoming.map(row) : <div className="empty"><b>Sin eventos próximos</b>Crea tu primer evento y compártelo.</div>}
+        {upcoming.length ? upcoming.map(row) : <div className="empty"><b>{c.noUpcoming}</b>{c.noUpcomingSub}</div>}
       </div>
       {past.length > 0 && (
         <>
-          <h2 className="ghead">Pasados</h2>
+          <h2 className="ghead">{c.past}</h2>
           <div className="list" style={{ opacity: 0.65 }}>{past.map(row)}</div>
         </>
       )}

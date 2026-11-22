@@ -2,18 +2,12 @@
 import jsQR from "jsqr";
 import { useEffect, useRef, useState } from "react";
 import { scanTicket } from "../actions";
+import { useT } from "@/components/LangProvider";
 
 type Result = { ok: boolean; title: string; sub: string };
 
-const REASON: Record<string, string> = {
-  not_found: "Este código no existe",
-  forbidden: "La entrada es de otro club",
-  used: "Ya se usó",
-  login: "Vuelve a iniciar sesión",
-  error: "Error de conexión, prueba otra vez",
-};
-
 export default function Scanner() {
+  const c = useT().club;
   const video = useRef<HTMLVideoElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
   const busy = useRef(false);
@@ -29,11 +23,11 @@ export default function Scanner() {
     const r = await scanTicket(code);
     if (r.ok) {
       setCount((c) => c + 1);
-      setResult({ ok: true, title: "✓ Adelante", sub: `${r.type ?? ""} · ${r.event ?? ""}` });
+      setResult({ ok: true, title: c.go, sub: `${r.type ?? ""} · ${r.event ?? ""}` });
       navigator.vibrate?.(120);
     } else {
-      const when = r.reason === "used" && r.scanned_at ? ` a las ${new Date(r.scanned_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}` : "";
-      setResult({ ok: false, title: "✕ No vale", sub: (REASON[r.reason ?? "error"] ?? "No válida") + when });
+      const when = r.reason === "used" && r.scanned_at ? c.usedAt(new Date(r.scanned_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })) : "";
+      setResult({ ok: false, title: c.noGo, sub: (c.reason[r.reason ?? "error"] ?? c.invalid) + when });
       navigator.vibrate?.([80, 60, 80]);
     }
     setTimeout(() => { busy.current = false; }, 1800);
@@ -69,7 +63,7 @@ export default function Scanner() {
         };
         raf = requestAnimationFrame(tick);
       } catch {
-        setCamErr("No se pudo abrir la cámara. Da permiso a la cámara en el navegador o escribe el código a mano.");
+        setCamErr(c.camErr);
         setOn(false);
       }
     })();
@@ -83,7 +77,7 @@ export default function Scanner() {
     <div>
       <div className="scanbox">
         <video ref={video} playsInline muted style={{ display: on ? "block" : "none" }} />
-        {!on && <button className="cta" onClick={() => { setCamErr(""); setOn(true); }}>Abrir cámara</button>}
+        {!on && <button className="cta" onClick={() => { setCamErr(""); setOn(true); }}>{c.openCam}</button>}
         {on && <span className="scanframe" aria-hidden="true" />}
       </div>
       <canvas ref={canvas} hidden />
@@ -98,10 +92,10 @@ export default function Scanner() {
         style={{ display: "flex", gap: 8, marginTop: 16 }}
         onSubmit={(e) => { e.preventDefault(); if (manual.trim()) { check(manual); setManual(""); } }}
       >
-        <input className="pill" style={{ flex: 1, fontSize: 16, padding: "12px 14px" }} value={manual} onChange={(e) => setManual(e.target.value.toUpperCase())} placeholder="Código a mano (ej. 7F3A9C21BD)" maxLength={20} autoCapitalize="characters" />
-        <button className="cta" style={{ padding: "12px 18px" }}>Validar</button>
+        <input className="pill" style={{ flex: 1, fontSize: 16, padding: "12px 14px" }} value={manual} onChange={(e) => setManual(e.target.value.toUpperCase())} placeholder={c.manualPh} maxLength={20} autoCapitalize="characters" />
+        <button className="cta" style={{ padding: "12px 18px" }}>{c.validate}</button>
       </form>
-      <p className="fine" style={{ marginTop: 12 }}>Validadas en esta sesión: {count}</p>
+      <p className="fine" style={{ marginTop: 12 }}>{c.validated(count)}</p>
     </div>
   );
 }

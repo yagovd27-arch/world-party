@@ -6,8 +6,9 @@ import { tzFor, utcToLocalInput } from "@/lib/format";
 import { supabaseServer } from "@/lib/supabase/server";
 import ClubTop from "../../../_ui/ClubTop";
 import EventForm from "../../../_ui/EventForm";
+import { getT } from "@/lib/lang";
 
-export const metadata = { title: "Editar evento" };
+export const metadata = { title: "la nit for clubs" };
 
 type Row = {
   id: string; club_id: string; city_id: string; title: string; description: string | null; lineup: string[]; type: string;
@@ -25,6 +26,7 @@ export default async function EditEvent({ params }: PageProps<"/club/eventos/[id
   const e = data as Row;
   const tz = tzFor(e.city_id);
   const city = await getCity(e.city_id);
+  const { t } = await getT();
   const tiers = [...e.ticket_types].sort((a, b) => a.sort - b.sort);
 
   return (
@@ -32,7 +34,7 @@ export default async function EditEvent({ params }: PageProps<"/club/eventos/[id
       <ClubTop active="panel" admin={admin} />
       <section className="section">
         <Link href={`/club/eventos/${e.id}`} className="fine">← {e.title}</Link>
-        <h1 style={{ fontSize: 26, fontWeight: 800, margin: "6px 0 18px" }}>Editar evento</h1>
+        <h1 style={{ fontSize: 26, fontWeight: 800, margin: "6px 0 18px" }}>{t.club.editTitle}</h1>
         <EventForm
           clubId={e.club_id}
           userId={user.id}

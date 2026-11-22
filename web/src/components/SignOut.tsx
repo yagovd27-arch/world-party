@@ -1,9 +1,11 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { supabaseBrowser } from "@/lib/supabase/client";
+import { useT } from "./LangProvider";
 
 export default function SignOut({ to = "/" }: { to?: string }) {
   const router = useRouter();
+  const t = useT();
   return (
     <button
       className="cta ghost block"
@@ -13,7 +15,7 @@ export default function SignOut({ to = "/" }: { to?: string }) {
         router.refresh();
       }}
     >
-      Cerrar sesión
+      {t.login.signOut}
     </button>
   );
 }

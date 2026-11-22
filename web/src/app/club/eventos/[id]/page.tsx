@@ -6,8 +6,9 @@ import { dayLabel, money, parts, tzFor } from "@/lib/format";
 import { supabaseServer } from "@/lib/supabase/server";
 import { setEventStatus } from "../../actions";
 import ClubTop from "../../_ui/ClubTop";
+import { getT } from "@/lib/lang";
 
-export const metadata = { title: "Evento" };
+export const metadata = { title: "la nit for clubs" };
 
 type Ev = {
   id: string; title: string; starts_at: string; status: string; city_id: string; image_url: string | null;
@@ -19,12 +20,13 @@ type Order = {
   tickets: { scanned_at: string | null }[];
 };
 
-const STATUS: Record<string, string> = { draft: "Borrador", published: "Publicado", cancelled: "Cancelado" };
 
 export default async function ClubEvent({ params, searchParams }: PageProps<"/club/eventos/[id]">) {
   const { id } = await params;
   const sp = await searchParams;
   const { admin } = await requireClub();
+  const { lang, t } = await getT();
+  const c = t.club;
   if (!/^[0-9a-f-]{36}$/i.test(id)) notFound();
 
   const sb = await supabaseServer();
@@ -61,35 +63,35 @@ export default async function ClubEvent({ params, searchParams }: PageProps<"/cl
     <>
       <ClubTop active="panel" admin={admin} />
       <section className="section">
-        <Link href="/club" className="fine">← Eventos</Link>
+        <Link href="/club" className="fine">{c.eventsBack}</Link>
         <div style={{ display: "flex", gap: 16, alignItems: "center", marginTop: 10 }}>
           <div className="ph" style={{ width: 84, height: 104, borderRadius: 10, flexShrink: 0, backgroundImage: e.image_url ? `url(${e.image_url})` : undefined, backgroundSize: "cover", backgroundPosition: "center" }} />
           <div style={{ minWidth: 0 }}>
-            <span className={`st st-${e.status}`}>{STATUS[e.status]}</span>
+            <span className={`st st-${e.status}`}>{c.status[e.status]}</span>
             <h1 style={{ fontSize: 24, fontWeight: 800, lineHeight: 1.15, marginTop: 6 }}>{e.title}</h1>
-            <span className="fine">{dayLabel(e.starts_at, tz)} · {parts(e.starts_at, tz).time} h</span>
+            <span className="fine">{dayLabel(e.starts_at, tz, lang)} · {t.hour(parts(e.starts_at, tz).time)}</span>
           </div>
         </div>
         {note && <p className="notice">{note}</p>}
         {err && <p className="error">{err}</p>}
 
         <div className="stats" style={{ marginTop: 18 }}>
-          <div className="stat"><b>{sold}<small className="fine">/{cap}</small></b><span>Vendidas</span></div>
-          <div className="stat"><b>{money(revenue, sym)}</b><span>Para el club</span></div>
-          <div className="stat"><b>{inside}</b><span>Han entrado</span></div>
+          <div className="stat"><b>{sold}<small className="fine">/{cap}</small></b><span>{c.soldCap}</span></div>
+          <div className="stat"><b>{money(revenue, sym)}</b><span>{c.forClub}</span></div>
+          <div className="stat"><b>{inside}</b><span>{c.inside}</span></div>
         </div>
 
         <div className="actions">
-          <Link href={`/club/eventos/${e.id}/editar`} className="cta">Editar</Link>
-          {e.status === "published" && <Link href={`/e/${e.id}`} className="cta ghost" target="_blank">Ver página pública</Link>}
-          <Link href="/club/scan" className="cta ghost">Escanear QR</Link>
+          <Link href={`/club/eventos/${e.id}/editar`} className="cta">{c.edit}</Link>
+          {e.status === "published" && <Link href={`/e/${e.id}`} className="cta ghost" target="_blank">{c.publicPage}</Link>}
+          <Link href="/club/scan" className="cta ghost">{c.tabScan}</Link>
         </div>
       </section>
 
-      <h2 className="ghead">Entradas</h2>
+      <h2 className="ghead">{t.tickets}</h2>
       <div className="section" style={{ paddingTop: 10 }}>
         <table className="t">
-          <thead><tr><th>Tipo</th><th>Precio</th><th>Vendidas</th><th>Ingresos</th></tr></thead>
+          <thead><tr><th>{c.tType}</th><th>{c.tPrice}</th><th>{c.tSold}</th><th>{c.tRevenue}</th></tr></thead>
           <tbody>
             {tiers.map((t) => (
               <tr key={t.id}><td>{t.name}</td><td>{money(t.price, sym)}</td><td>{t.sold}/{t.capacity}</td><td>{money(t.sold * t.price, sym)}</td></tr>
@@ -98,11 +100,11 @@ export default async function ClubEvent({ params, searchParams }: PageProps<"/cl
         </table>
       </div>
 
-      <h2 className="ghead">Compradores ({orders.length})</h2>
+      <h2 className="ghead">{c.buyers(orders.length)}</h2>
       <div className="section" style={{ paddingTop: 10, overflowX: "auto" }}>
         {orders.length ? (
           <table className="t">
-            <thead><tr><th>Nombre</th><th>Entradas</th><th>Contacto</th><th>Dentro</th></tr></thead>
+            <thead><tr><th>{c.bName}</th><th>{c.bTickets}</th><th>{c.bContact}</th><th>{c.bInside}</th></tr></thead>
             <tbody>
               {orders.map((o) => (
                 <tr key={o.id}>
@@ -114,14 +116,14 @@ export default async function ClubEvent({ params, searchParams }: PageProps<"/cl
               ))}
             </tbody>
           </table>
-        ) : <div className="empty"><b>Aún no hay ventas</b>Comparte el link del evento en tu Instagram.</div>}
+        ) : <div className="empty"><b>{c.noSales}</b>{c.noSalesSub}</div>}
       </div>
 
       <div className="section actions" style={{ paddingBottom: 30 }}>
-        {e.status === "draft" && statusBtn("published", "Publicar", false)}
-        {e.status === "published" && statusBtn("draft", "Despublicar")}
-        {e.status === "cancelled" && statusBtn("draft", "Recuperar como borrador")}
-        {e.status !== "cancelled" && sold === 0 && statusBtn("cancelled", "Cancelar evento")}
+        {e.status === "draft" && statusBtn("published", c.publish, false)}
+        {e.status === "published" && statusBtn("draft", c.unpublish)}
+        {e.status === "cancelled" && statusBtn("draft", c.restore)}
+        {e.status !== "cancelled" && sold === 0 && statusBtn("cancelled", c.cancelEvent)}
       </div>
     </>
   );

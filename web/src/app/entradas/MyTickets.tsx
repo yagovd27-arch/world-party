@@ -2,9 +2,11 @@
 import Link from "next/link";
 import QRCode from "qrcode";
 import { useEffect, useState } from "react";
+import { useT } from "@/components/LangProvider";
 import { getLocalOrders, getOrderRefs, type LocalOrder, type OrderRef } from "@/lib/local-orders";
 
 export default function MyTickets({ hideIds, hasAccountOrders }: { hideIds: string[]; hasAccountOrders: boolean }) {
+  const t = useT();
   const [refs, setRefs] = useState<OrderRef[] | null>(null);
   const [local, setLocal] = useState<LocalOrder[]>([]);
   const [qrs, setQrs] = useState<Record<string, string>>({});
@@ -24,8 +26,8 @@ export default function MyTickets({ hideIds, hasAccountOrders }: { hideIds: stri
     if (hasAccountOrders) return null;
     return (
       <div className="list">
-        <div className="empty"><b>Aún no tienes entradas</b>Cuando compres, tu QR aparece aquí.
-          <div style={{ marginTop: 16 }}><Link href="/" className="cta">Ver eventos</Link></div>
+        <div className="empty"><b>{t.noTickets}</b>{t.noTicketsSub}
+          <div style={{ marginTop: 16 }}><Link href="/" className="cta">{t.seeEvents}</Link></div>
         </div>
       </div>
     );
@@ -37,29 +39,29 @@ export default function MyTickets({ hideIds, hasAccountOrders }: { hideIds: stri
         <div className="list">
           {refs.map((r, i) => (
             <Link key={r.id} href={`/t/${r.id}?k=${r.key}`} className="card" style={{ display: "flex", justifyContent: "space-between" }}>
-              <span>Entradas compradas en este móvil · {i + 1}</span><span className="scarce">Ver QR →</span>
+              <span>{t.boughtHere(i + 1)}</span><span className="scarce">{t.seeQr}</span>
             </Link>
           ))}
         </div>
       )}
       {local.map((o) => (
         <div key={o.id}>
-          <p className="fine section">Compra de prueba (modo demo)</p>
+          <p className="fine section">{t.demoPurchase}</p>
           {o.codes.map((c, i) => (
             <div className="ticket" key={c}>
               <div className="tb">
                 <h2>{o.event.title}</h2>
                 <div className="tgrid">
-                  <div><span>Cuándo</span><b>{o.event.starts}</b></div>
-                  <div><span>Lugar</span><b>{o.event.venue}</b></div>
-                  <div><span>Entradas</span><b>{o.lines.map((l) => `${l.qty}× ${l.name}`).join(", ")}</b></div>
+                  <div><span>{t.when}</span><b>{o.event.starts}</b></div>
+                  <div><span>{t.venue}</span><b>{o.event.venue}</b></div>
+                  <div><span>{t.tickets}</span><b>{o.lines.map((l) => `${l.qty}× ${l.name}`).join(", ")}</b></div>
                   <div><span>QR</span><b>{i + 1}/{o.codes.length}</b></div>
                 </div>
               </div>
               <div className="perf" />
               <div className="qr">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                {qrs[c] && <img src={qrs[c]} alt={`Código QR ${c}`} />}
+                {qrs[c] && <img src={qrs[c]} alt={t.qrAlt(c)} />}
                 <code>{c}</code>
               </div>
             </div>

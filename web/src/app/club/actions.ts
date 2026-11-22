@@ -5,32 +5,34 @@ import { redirect } from "next/navigation";
 import { getUser, isAdmin } from "@/lib/auth";
 import { tzFor, zonedToUtc } from "@/lib/format";
 import { supabaseAdmin, supabaseServer } from "@/lib/supabase/server";
+import { getT } from "@/lib/lang";
 
 const str = (f: FormData, k: string, max = 200) => String(f.get(k) ?? "").trim().slice(0, max);
 const UUID = /^[0-9a-f-]{36}$/i;
 
 /** Alta de un club u organizador. Queda pendiente de verificar. */
 export async function createClub(form: FormData) {
+  const c = (await getT()).t.club;
   const user = await getUser();
   if (!user) {
     console.error("[createClub] sin sesión");
-    redirect("/club?e=" + encodeURIComponent("Tu sesión ha caducado. Vuelve a entrar."));
+    redirect("/club?e=" + encodeURIComponent(c.eSession));
   }
   const name = str(form, "name", 80);
   const city_id = str(form, "city", 40);
   const area = str(form, "area", 80) || null;
   const instagram = str(form, "instagram", 60).replace(/^@/, "") || null;
   const phone = str(form, "phone", 30) || null;
-  if (name.length < 2 || !city_id) redirect("/club?e=" + encodeURIComponent("Escribe el nombre y elige la ciudad."));
+  if (name.length < 2 || !city_id) redirect("/club?e=" + encodeURIComponent(c.eNameCity));
 
   const admin = supabaseAdmin();
   const { count } = await admin.from("club_members").select("club_id", { count: "exact", head: true }).eq("user_id", user.id).eq("role", "owner");
-  if ((count ?? 0) >= 5) redirect("/club?e=" + encodeURIComponent("Ya tienes 5 clubs registrados."));
+  if ((count ?? 0) >= 5) redirect("/club?e=" + encodeURIComponent(c.eMax));
 
   const { data: club, error } = await admin.from("clubs").insert({ name, city_id, area, instagram, phone }).select("id").single();
   if (error || !club) {
     console.error("[createClub] insert club", error);
-    redirect("/club?e=" + encodeURIComponent("No se pudo registrar: " + (error?.message ?? "error desconocido")));
+    redirect("/club?e=" + encodeURIComponent(c.eRegister(error?.message ?? "?")));
   }
   const { error: memberErr } = await admin.from("club_members").insert({ club_id: club.id, user_id: user.id, role: "owner" });
   if (memberErr) console.error("[createClub] insert member", memberErr);
@@ -46,23 +48,24 @@ export type EventInput = {
 
 /** Crear o editar un evento con sus tipos de entrada. Las reglas de seguridad comprueban que el usuario es del club. */
 export async function saveEvent(input: EventInput): Promise<{ ok: true; id: string; note?: string } | { ok: false; error: string }> {
+  const c = (await getT()).t.club;
   const user = await getUser();
-  if (!user) return { ok: false, error: "Tu sesión ha caducado. Vuelve a entrar." };
-  if (!UUID.test(input.clubId) || (input.id && !UUID.test(input.id))) return { ok: false, error: "Datos no válidos." };
+  if (!user) return { ok: false, error: c.eSession };
+  if (!UUID.test(input.clubId) || (input.id && !UUID.test(input.id))) return { ok: false, error: c.eData };
 
   const sb = await supabaseServer();
   const { data: club } = await sb.from("clubs").select("id, city_id, verified").eq("id", input.clubId).maybeSingle();
-  if (!club) return { ok: false, error: "Club no encontrado." };
+  if (!club) return { ok: false, error: c.eClub };
 
   const title = input.title.trim().slice(0, 90);
-  if (title.length < 2) return { ok: false, error: "Ponle un nombre al evento." };
+  if (title.length < 2) return { ok: false, error: c.eTitle };
   const starts = zonedToUtc(input.startsLocal, tzFor(club.city_id));
-  if (!starts) return { ok: false, error: "Elige la fecha y la hora." };
-  if (!input.id && Date.parse(starts) < Date.now() - 3600e3) return { ok: false, error: "La fecha ya ha pasado." };
-  if (!["club", "concierto", "fiesta"].includes(input.type)) return { ok: false, error: "Tipo de evento no válido." };
+  if (!starts) return { ok: false, error: c.eDate };
+  if (!input.id && Date.parse(starts) < Date.now() - 3600e3) return { ok: false, error: c.ePast };
+  if (!["club", "concierto", "fiesta"].includes(input.type)) return { ok: false, error: c.eType };
   const imageUrl = input.imageUrl.trim();
   if (imageUrl && !/^https:\/\/[a-z0-9.-]+\.supabase\.co\/storage\/v1\/object\/public\/event-images\//i.test(imageUrl)) {
-    return { ok: false, error: "Foto no válida." };
+    return { ok: false, error: c.ePhoto };
   }
 
   const tiers = input.tiers
@@ -75,11 +78,11 @@ export async function saveEvent(input: EventInput): Promise<{ ok: true; id: stri
       sales_end: t.salesEnd ? zonedToUtc(t.salesEnd, tzFor(club.city_id)) : null,
       sort: i,
     }));
-  if (!tiers.length) return { ok: false, error: "Añade al menos un tipo de entrada." };
+  if (!tiers.length) return { ok: false, error: c.eNoTiers };
   for (const t of tiers) {
-    if (!t.name) return { ok: false, error: "Cada entrada necesita un nombre (Early bird, General, VIP…)." };
-    if (!Number.isFinite(t.price) || t.price < 0 || t.price > 1_000_000) return { ok: false, error: `Precio no válido en “${t.name}”.` };
-    if (!Number.isFinite(t.capacity) || t.capacity < 1 || t.capacity > 100_000) return { ok: false, error: `Cupo no válido en “${t.name}”.` };
+    if (!t.name) return { ok: false, error: c.eTierName };
+    if (!Number.isFinite(t.price) || t.price < 0 || t.price > 1_000_000) return { ok: false, error: c.ePrice(t.name) };
+    if (!Number.isFinite(t.capacity) || t.capacity < 1 || t.capacity > 100_000) return { ok: false, error: c.eCap(t.name) };
   }
 
   const row = {
@@ -102,10 +105,10 @@ export async function saveEvent(input: EventInput): Promise<{ ok: true; id: stri
 
   if (eventId) {
     const { error } = await sb.from("events").update({ ...row, ...statusPatch }).eq("id", eventId);
-    if (error) return { ok: false, error: "No se pudo guardar el evento." };
+    if (error) return { ok: false, error: c.eSave };
   } else {
     const { data, error } = await sb.from("events").insert({ ...row, status: wantPublish ? "published" : "draft" }).select("id").single();
-    if (error || !data) return { ok: false, error: "No se pudo crear el evento." };
+    if (error || !data) return { ok: false, error: c.eCreate };
     eventId = data.id as string;
   }
 
@@ -114,23 +117,23 @@ export async function saveEvent(input: EventInput): Promise<{ ok: true; id: stri
   const keep = new Set(tiers.filter((t) => t.id).map((t) => t.id));
   for (const old of current ?? []) {
     if (!keep.has(old.id)) {
-      if (old.sold > 0) return { ok: false, error: `“${old.name}” ya tiene ventas: no se puede quitar. Pon el cupo igual a las vendidas para cerrarla.` };
+      if (old.sold > 0) return { ok: false, error: c.eHasSales(old.name) };
       await sb.from("ticket_types").delete().eq("id", old.id);
     }
   }
   for (const t of tiers) {
     const was = current?.find((c) => c.id === t.id);
-    if (was && t.capacity < was.sold) return { ok: false, error: `“${t.name}”: el cupo no puede ser menor que las ya vendidas (${was.sold}).` };
+    if (was && t.capacity < was.sold) return { ok: false, error: c.eCapBelow(t.name, was.sold) };
     const { id, ...vals } = t;
     const res = id && was
       ? await sb.from("ticket_types").update(vals).eq("id", id)
       : await sb.from("ticket_types").insert({ ...vals, event_id: eventId });
-    if (res.error) return { ok: false, error: "No se pudieron guardar las entradas." };
+    if (res.error) return { ok: false, error: c.eTiers };
   }
 
   revalidatePath("/club");
   revalidatePath("/");
-  const note = input.publish === "publish" && !canPublish ? "Guardado como borrador: podrás publicar en cuanto verifiquemos tu club." : undefined;
+  const note = input.publish === "publish" && !canPublish ? c.nDraft : undefined;
   return { ok: true, id: eventId!, note };
 }
 
@@ -141,9 +144,10 @@ export async function setEventStatus(form: FormData) {
   if (!UUID.test(id) || !["draft", "published", "cancelled"].includes(status)) return;
   const sb = await supabaseServer();
   const { error } = await sb.from("events").update({ status }).eq("id", id);
+  const c = (await getT()).t.club;
   revalidatePath("/club");
   revalidatePath("/");
-  redirect(`/club/eventos/${id}${error ? "?e=" + encodeURIComponent(/club_not_verified/.test(error.message) ? "Tu club aún no está verificado: te avisamos en cuanto lo esté." : "No se pudo cambiar el estado.") : ""}`);
+  redirect(`/club/eventos/${id}${error ? "?e=" + encodeURIComponent(/club_not_verified/.test(error.message) ? c.eNotVerified : c.eStatus) : ""}`);
 }
 
 /** Escanear un QR en la puerta. */

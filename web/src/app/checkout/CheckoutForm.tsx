@@ -2,6 +2,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { saveLocalOrder, saveOrderRef } from "@/lib/local-orders";
+import { useT } from "@/components/LangProvider";
 
 type RazorpayResponse = { razorpay_order_id: string; razorpay_payment_id: string; razorpay_signature: string };
 declare global {
@@ -23,6 +24,7 @@ function loadRazorpay(): Promise<boolean> {
 
 export default function CheckoutForm({ eventId, items, totalLabel, defaultEmail }: { eventId: string; items: { id: string; qty: number }[]; totalLabel: string; defaultEmail: string }) {
   const router = useRouter();
+  const t = useT();
   const [name, setName] = useState("");
   const [email, setEmail] = useState(defaultEmail);
   const [phone, setPhone] = useState("");
@@ -32,9 +34,9 @@ export default function CheckoutForm({ eventId, items, totalLabel, defaultEmail 
   async function submit(ev: React.FormEvent) {
     ev.preventDefault();
     setErr("");
-    if (name.trim().length < 2) return setErr("Escribe tu nombre.");
-    if (!/^\S+@\S+\.\S+$/.test(email)) return setErr("Escribe un email válido: ahí te llega la entrada.");
-    if (phone.replace(/\D/g, "").length < 8) return setErr("Escribe un teléfono válido.");
+    if (name.trim().length < 2) return setErr(t.errName);
+    if (!/^\S+@\S+\.\S+$/.test(email)) return setErr(t.errEmailTicket);
+    if (phone.replace(/\D/g, "").length < 8) return setErr(t.errPhone);
     setBusy(true);
     try {
       const res = await fetch("/api/orders", {
@@ -43,7 +45,7 @@ export default function CheckoutForm({ eventId, items, totalLabel, defaultEmail 
         body: JSON.stringify({ eventId, items, buyer: { name: name.trim(), email: email.trim(), phone: phone.trim() } }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "No se pudo crear el pedido.");
+      if (!res.ok) throw new Error(data.error ?? t.errOrder);
 
       if (data.mode === "local") {
         saveLocalOrder(data.order);
@@ -56,7 +58,7 @@ export default function CheckoutForm({ eventId, items, totalLabel, defaultEmail 
         return;
       }
       if (data.mode === "razorpay") {
-        if (!(await loadRazorpay()) || !window.Razorpay) throw new Error("No se pudo abrir la pasarela de pago.");
+        if (!(await loadRazorpay()) || !window.Razorpay) throw new Error(t.errGateway);
         const rp = new window.Razorpay({
           key: data.keyId,
           order_id: data.providerOrderId,
@@ -73,31 +75,31 @@ export default function CheckoutForm({ eventId, items, totalLabel, defaultEmail 
               body: JSON.stringify(r),
             });
             const vd = await v.json();
-            if (!v.ok) { setErr(vd.error ?? "No se pudo confirmar el pago."); setBusy(false); return; }
+            if (!v.ok) { setErr(vd.error ?? t.errConfirm); setBusy(false); return; }
             saveOrderRef({ id: data.orderId, key: data.accessKey });
             router.push(`/t/${data.orderId}?k=${data.accessKey}&nuevo=1`);
           },
           modal: { ondismiss: () => setBusy(false) },
         });
-        rp.on("payment.failed", () => { setErr("El pago no se completó. Prueba otra vez u otro método."); setBusy(false); });
+        rp.on("payment.failed", () => { setErr(t.errPayFailed); setBusy(false); });
         rp.open();
         return;
       }
-      throw new Error("Respuesta inesperada.");
+      throw new Error(t.errUnexpected);
     } catch (e) {
-      setErr(e instanceof Error ? e.message : "Algo falló.");
+      setErr(e instanceof Error ? e.message : t.errGeneric);
       setBusy(false);
     }
   }
 
   return (
     <form onSubmit={submit} noValidate style={{ marginTop: 18 }}>
-      <div className="field"><label htmlFor="n">Nombre completo</label><input id="n" autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} /></div>
-      <div className="field"><label htmlFor="em">Email</label><input id="em" type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} /></div>
-      <div className="field"><label htmlFor="ph">Teléfono (WhatsApp)</label><input id="ph" type="tel" autoComplete="tel" value={phone} onChange={(e) => setPhone(e.target.value)} /></div>
-      <button className="cta block gold" disabled={busy}>{busy ? "Procesando…" : `Pagar ${totalLabel}`}</button>
+      <div className="field"><label htmlFor="n">{t.fullName}</label><input id="n" autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} /></div>
+      <div className="field"><label htmlFor="em">{t.email}</label><input id="em" type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} /></div>
+      <div className="field"><label htmlFor="ph">{t.phoneWa}</label><input id="ph" type="tel" autoComplete="tel" value={phone} onChange={(e) => setPhone(e.target.value)} /></div>
+      <button className="cta block gold" disabled={busy}>{busy ? t.processing : t.payX(totalLabel)}</button>
       {err && <p className="error" role="alert">{err}</p>}
-      <p className="fine" style={{ marginTop: 12, textAlign: "center" }}>Pago seguro con UPI o tarjeta. Recibirás tu entrada con QR al instante.</p>
+      <p className="fine" style={{ marginTop: 12, textAlign: "center" }}>{t.payNote}</p>
     </form>
   );
 }
