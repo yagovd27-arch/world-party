@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { cookies } from "next/headers";
 import LoginForm from "@/components/LoginForm";
+import SubmitButton from "@/components/SubmitButton";
 import { getCities } from "@/lib/data";
 import { getCurrentClub, getUser, isAdmin } from "@/lib/auth";
 import { dayLabel, money, parts, tzFor } from "@/lib/format";
@@ -57,8 +58,7 @@ export default async function ClubHome({ searchParams }: PageProps<"/club">) {
             <div className="row2">
               <div className="field">
                 <label htmlFor="city">Ciudad</label>
-                <select id="city" name="city" required defaultValue="">
-                  <option value="" disabled>Elige</option>
+                <select id="city" name="city" required defaultValue={cities.find((c) => c.id === "gurugram")?.id ?? cities[0]?.id}>
                   {cities.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </select>
               </div>
@@ -68,8 +68,8 @@ export default async function ClubHome({ searchParams }: PageProps<"/club">) {
               <div className="field"><label htmlFor="instagram">Instagram</label><input id="instagram" name="instagram" maxLength={60} placeholder="@tuclub" /></div>
               <div className="field"><label htmlFor="phone">WhatsApp</label><input id="phone" name="phone" type="tel" maxLength={30} placeholder="+91 …" /></div>
             </div>
-            <button className="cta block">Registrar</button>
-            {err && <p className="error">{err}</p>}
+            <SubmitButton pendingText="Registrando…">Registrar</SubmitButton>
+            {err && <p className="error" role="alert">{err}</p>}
           </form>
           <p className="fine" style={{ marginTop: 18 }}>Sesión: {user.email}</p>
         </section>

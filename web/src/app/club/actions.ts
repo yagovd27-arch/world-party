@@ -12,7 +12,10 @@ const UUID = /^[0-9a-f-]{36}$/i;
 /** Alta de un club u organizador. Queda pendiente de verificar. */
 export async function createClub(form: FormData) {
   const user = await getUser();
-  if (!user) redirect("/club");
+  if (!user) {
+    console.error("[createClub] sin sesión");
+    redirect("/club?e=" + encodeURIComponent("Tu sesión ha caducado. Vuelve a entrar."));
+  }
   const name = str(form, "name", 80);
   const city_id = str(form, "city", 40);
   const area = str(form, "area", 80) || null;
@@ -25,8 +28,12 @@ export async function createClub(form: FormData) {
   if ((count ?? 0) >= 5) redirect("/club?e=" + encodeURIComponent("Ya tienes 5 clubs registrados."));
 
   const { data: club, error } = await admin.from("clubs").insert({ name, city_id, area, instagram, phone }).select("id").single();
-  if (error || !club) redirect("/club?e=" + encodeURIComponent("No se pudo registrar. Inténtalo otra vez."));
-  await admin.from("club_members").insert({ club_id: club.id, user_id: user.id, role: "owner" });
+  if (error || !club) {
+    console.error("[createClub] insert club", error);
+    redirect("/club?e=" + encodeURIComponent("No se pudo registrar: " + (error?.message ?? "error desconocido")));
+  }
+  const { error: memberErr } = await admin.from("club_members").insert({ club_id: club.id, user_id: user.id, role: "owner" });
+  if (memberErr) console.error("[createClub] insert member", memberErr);
   (await cookies()).set("club", club.id, { path: "/", maxAge: 60 * 60 * 24 * 365, sameSite: "lax" });
   redirect("/club");
 }
