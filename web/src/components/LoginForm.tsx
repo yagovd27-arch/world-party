@@ -3,12 +3,13 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { supabaseBrowser } from "@/lib/supabase/client";
 
-/** Entrar con el email: te llega un código y lo escribes. Sin contraseñas. */
-export default function LoginForm({ next, cta = "Recibir código" }: { next: string; cta?: string }) {
+/** Entrar con el email: te llega un enlace (o un código). Sin contraseñas. */
+export default function LoginForm({ next, cta = "Entrar con email" }: { next: string; cta?: string }) {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
   const [step, setStep] = useState<"email" | "code">("email");
+  const [showCode, setShowCode] = useState(false);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
 
@@ -17,7 +18,10 @@ export default function LoginForm({ next, cta = "Recibir código" }: { next: str
     setErr("");
     if (!/^\S+@\S+\.\S+$/.test(email.trim())) return setErr("Escribe un email válido.");
     setBusy(true);
-    const { error } = await supabaseBrowser().auth.signInWithOtp({ email: email.trim(), options: { shouldCreateUser: true } });
+    const { error } = await supabaseBrowser().auth.signInWithOtp({
+      email: email.trim(),
+      options: { shouldCreateUser: true, emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}` },
+    });
     setBusy(false);
     if (error) {
       setErr(/rate|seconds/i.test(error.message) ? "Espera un momento antes de pedir otro código." : "No se pudo enviar el código. Inténtalo otra vez.");
@@ -41,16 +45,25 @@ export default function LoginForm({ next, cta = "Recibir código" }: { next: str
 
   if (step === "code") {
     return (
-      <form onSubmit={verify}>
-        <p className="muted" style={{ fontSize: 14, marginBottom: 14 }}>Te mandamos un código a <b style={{ color: "var(--cream)" }}>{email}</b>. Mira también en spam.</p>
-        <div className="field">
-          <label htmlFor="code">Código</label>
-          <input id="code" inputMode="numeric" autoComplete="one-time-code" value={code} onChange={(e) => setCode(e.target.value)} placeholder="123456" autoFocus />
+      <div>
+        <div className="card" style={{ textAlign: "center" }}>
+          <b style={{ fontSize: 18 }}>Revisa tu email</b>
+          <p className="muted" style={{ fontSize: 14, marginTop: 6 }}>Te mandamos un enlace a <b style={{ color: "var(--cream)" }}>{email}</b>. Púlsalo y entras. Mira también en spam.</p>
         </div>
-        <button className="cta block" disabled={busy}>{busy ? "Comprobando…" : "Entrar"}</button>
+        {showCode ? (
+          <form onSubmit={verify} style={{ marginTop: 16 }}>
+            <div className="field">
+              <label htmlFor="code">Código del email</label>
+              <input id="code" inputMode="numeric" autoComplete="one-time-code" value={code} onChange={(e) => setCode(e.target.value)} placeholder="123456" autoFocus />
+            </div>
+            <button className="cta block" disabled={busy}>{busy ? "Comprobando…" : "Entrar"}</button>
+          </form>
+        ) : (
+          <button type="button" className="fine" style={{ marginTop: 14, textDecoration: "underline" }} onClick={() => setShowCode(true)}>¿Te llegó un código? Escríbelo aquí</button>
+        )}
         {err && <p className="error">{err}</p>}
-        <button type="button" className="fine" style={{ marginTop: 14 }} onClick={() => { setStep("email"); setCode(""); setErr(""); }}>← Usar otro email</button>
-      </form>
+        <button type="button" className="fine" style={{ marginTop: 14, display: "block" }} onClick={() => { setStep("email"); setCode(""); setErr(""); setShowCode(false); }}>← Usar otro email</button>
+      </div>
     );
   }
 
