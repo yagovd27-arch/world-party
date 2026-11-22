@@ -30,9 +30,9 @@ export default function TicketPicker({ eventId, symbol, tiers }: { eventId: stri
               <div>
                 <div className="nm">{t.name}</div>
                 <div className="pr">{money(t.price, symbol)}</div>
-                <div className="nt">{out ? "Agotado" : left <= 20 ? `Quedan ${left}` : t.description ?? ""}</div>
+                <div className="nt">{out ? "Agotado" : [t.description, left <= 20 ? `Quedan ${left}` : ""].filter(Boolean).join(". ")}</div>
               </div>
-              {out ? <span className="badge">Agotado</span> : (
+              {out ? null : (
                 <div className="step">
                   <button type="button" onClick={() => change(t, -1)} disabled={!n} aria-label={`Quitar ${t.name}`}>−</button>
                   <b aria-live="polite">{n}</b>

@@ -86,3 +86,4 @@ export function utcToLocalInput(iso: string, tz: string) {
   const p = parts(iso, tz);
   return `${p.ymd}T${p.time}`;
 }
+export const WEEKDAYS_LONG = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];

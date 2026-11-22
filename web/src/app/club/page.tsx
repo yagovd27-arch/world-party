@@ -28,14 +28,14 @@ export default async function ClubHome({ searchParams }: PageProps<"/club">) {
       <>
         <ClubTop loggedIn={false} />
         <section className="section" style={{ maxWidth: 520 }}>
-          <h1 style={{ fontSize: 32, fontWeight: 800, lineHeight: 1.08 }}>Vende tus entradas sin pagar nada.</h1>
-          <p className="desc">Publica tus eventos en 3 minutos, vende early bird, general y VIP, y escanea los QR en la puerta desde el móvil. Al club no le cuesta nada: el comprador paga un pequeño cargo de servicio.</p>
-          <div className="card" style={{ margin: "18px 0 22px", display: "grid", gap: 10, fontSize: 14 }}>
-            <span>✓ Ventas en tiempo real</span>
-            <span>✓ Cupos y precios por tipo de entrada</span>
-            <span>✓ Escáner de QR en la puerta: cada entrada vale una vez</span>
-            <span>✓ Lista de compradores para tu equipo</span>
-          </div>
+          <h1 style={{ fontFamily: "var(--display)", fontSize: 56, fontWeight: 800, lineHeight: 0.92, letterSpacing: 0 }}>Vende tus entradas sin pagar nada</h1>
+          <p className="desc">Publica tu evento en tres minutos y compártelo en Instagram. El dinero de cada entrada es para el club.</p>
+          <dl className="facts" style={{ margin: "22px 0 26px" }}>
+            <div><dt>Ventas</dt><dd>Las ves en tiempo real, entrada a entrada.</dd></div>
+            <div><dt>Entradas</dt><dd>Early bird, general y VIP, cada una con su precio y su cupo.</dd></div>
+            <div><dt>Puerta</dt><dd>Escaneas los QR con el móvil. Cada entrada vale una sola vez.</dd></div>
+            <div><dt>Coste</dt><dd>Cero para el club. El comprador paga un cargo de servicio.</dd></div>
+          </dl>
           {isSupabaseOn ? <LoginForm next="/club" cta="Entrar o registrar mi club" /> : <p className="notice">El panel se activa al conectar la base de datos.</p>}
         </section>
       </>
