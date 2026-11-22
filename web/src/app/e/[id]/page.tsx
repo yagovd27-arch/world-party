@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import Pin from "@/components/Pin";
 import { notFound } from "next/navigation";
 import TicketPicker from "./TicketPicker";
 import { getCity, getEvent } from "@/lib/data";
@@ -35,9 +36,16 @@ export default async function EventPage({ params }: PageProps<"/e/[id]">) {
       <div className="edet">
         <h1>{e.title}</h1>
         <p className="ekind">{kind}, solo mayores de {e.min_age}</p>
+        <a className="place" href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent([e.club.name, e.club.address || e.club.area, city.name].filter(Boolean).join(", "))}`} target="_blank" rel="noopener noreferrer">
+          <span className="place-ic"><Pin size={18} /></span>
+          <span className="place-tx">
+            <b>{e.club.name}</b>
+            <span>{[e.club.address || e.club.area, city.name].filter(Boolean).join(", ")}</span>
+          </span>
+          <span className="place-go">Ver mapa</span>
+        </a>
         <dl className="facts">
           <div><dt>Cuándo</dt><dd>{dayLabel(e.starts_at, tz)}<span>Abre a las {p.time} h</span></dd></div>
-          <div><dt>Dónde</dt><dd>{e.club.name}<span>{[e.club.area, city.name].filter(Boolean).join(", ")}</span></dd></div>
           {e.dress_code && <div><dt>Dress code</dt><dd>{e.dress_code}</dd></div>}
           {e.lineup.length > 0 && <div><dt>Line-up</dt><dd>{e.lineup.join(", ")}</dd></div>}
         </dl>

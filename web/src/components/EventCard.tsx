@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import Pin from "./Pin";
 import { money, parts, tzFor } from "@/lib/format";
 import type { City, EventItem } from "@/lib/types";
 
@@ -21,7 +22,7 @@ export default function EventCard({ e, city }: { e: EventItem; city: City }) {
       </div>
       <div className="ecard-body">
         <h3>{e.title}</h3>
-        <p className="ecard-place">{e.club.name}{e.club.area ? `, ${e.club.area}` : ""}</p>
+        <p className="ecard-place"><Pin size={12} /><span>{e.club.name}</span></p>
         <p className="ecard-meta">
           <span>{parts(e.starts_at, tzFor(e.city_id)).time} h</span>
           <span className="price">{from === null ? "Agotado" : `Desde ${money(from, city.currency_symbol)}`}</span>
