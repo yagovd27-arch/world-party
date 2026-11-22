@@ -1,15 +1,14 @@
 import Link from "next/link";
-import { cookies } from "next/headers";
 import BottomNav from "@/components/BottomNav";
 import EventCard from "@/components/EventCard";
+import { currentCity } from "@/lib/city";
 import { getCities, getCityEvents } from "@/lib/data";
 import { dayOffset, MONTHS, parts, tzFor, weekdayShort, WEEKDAYS_LONG } from "@/lib/format";
 
 export default async function Home({ searchParams }: PageProps<"/">) {
   const sp = await searchParams;
   const cities = await getCities();
-  const saved = (await cookies()).get("city")?.value;
-  const city = cities.find((c) => c.id === saved) ?? cities[0];
+  const { city } = await currentCity(cities);
   if (!city) return <main className="shell"><p className="section">No hay ciudades configuradas.</p></main>;
 
   const tz = tzFor(city.id);
@@ -17,7 +16,7 @@ export default async function Home({ searchParams }: PageProps<"/">) {
   const sel = typeof sp.d === "string" && /^\d+$/.test(sp.d) ? Number(sp.d) : null;
   const shown = sel === null ? events : events.filter((e) => dayOffset(e.starts_at, tz) === sel);
 
-  const groups: { key: string; num: string; top: string; bottom: string; items: typeof shown }[] = [];
+  const groups: { key: string; top: string; bottom: string; items: typeof shown }[] = [];
   for (const e of shown) {
     const p = parts(e.starts_at, tz);
     const off = dayOffset(e.starts_at, tz);
@@ -25,9 +24,8 @@ export default async function Home({ searchParams }: PageProps<"/">) {
     if (g) { g.items.push(e); continue; }
     groups.push({
       key: p.ymd,
-      num: String(p.day).padStart(2, "0"),
       top: off === 0 ? "Hoy" : off === 1 ? "Mañana" : WEEKDAYS_LONG[p.weekday],
-      bottom: off <= 1 ? `${WEEKDAYS_LONG[p.weekday]} ${p.day} ${MONTHS[p.month]}` : MONTHS[p.month],
+      bottom: off <= 1 ? `${WEEKDAYS_LONG[p.weekday]} ${p.day} de ${MONTHS[p.month]}` : `${p.day} de ${MONTHS[p.month]}`,
       items: [e],
     });
   }
@@ -69,11 +67,8 @@ export default async function Home({ searchParams }: PageProps<"/">) {
       </nav>
 
       {groups.length ? groups.map((g) => (
-        <section key={g.key} className="daygroup" aria-label={`${g.top} ${g.num}`}>
-          <header className="dayhead">
-            <span className="dnum">{g.num}</span>
-            <span className="dtxt"><b>{g.top}</b>{g.bottom}</span>
-          </header>
+        <section key={g.key} className="daygroup" aria-label={`${g.top}, ${g.bottom}`}>
+          <h2 className="dayhead"><b>{g.top}</b><span>{g.bottom}</span></h2>
           <div className="posters">{g.items.map((e) => <EventCard key={e.id} e={e} city={city} />)}</div>
         </section>
       )) : (

@@ -1,12 +1,12 @@
 import Image from "next/image";
 import Link from "next/link";
-import { cookies } from "next/headers";
 import BottomNav from "@/components/BottomNav";
+import { currentCity } from "@/lib/city";
 import { getCities, getEventCounts } from "@/lib/data";
 
 export default async function Cities() {
   const [cities, counts] = await Promise.all([getCities(), getEventCounts()]);
-  const current = (await cookies()).get("city")?.value;
+  const current = (await currentCity(cities)).city?.id;
   return (
     <main className="shell">
       <header className="top">
@@ -18,9 +18,9 @@ export default async function Cities() {
       </header>
       <section className="section">
         <div className="cities">
-          {cities.map((c, i) => (
-            <Link key={c.id} href={`/c/${c.id}`} prefetch={false} className={`city ph ${i === 0 ? "wide" : ""}`}>
-              {c.image_url && <Image src={c.image_url} alt={c.name} fill sizes="(max-width: 480px) 100vw, 480px" />}
+          {cities.map((c) => (
+            <Link key={c.id} href={`/c/${c.id}`} prefetch={false} className="city ph">
+              {c.image_url && <Image src={c.image_url} alt={c.name} fill sizes="(max-width: 560px) 50vw, 270px" />}
               <span className="shade" />
               {c.id === current && <span className="badge cream tag">Tu ciudad</span>}
               <span className="lbl"><b>{c.name}</b><span>{c.country} · {counts[c.id] ?? 0} eventos</span></span>
