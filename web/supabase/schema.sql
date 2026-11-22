@@ -1,4 +1,4 @@
--- denoche — esquema de base de datos (Supabase / Postgres)
+-- la nit — esquema de base de datos (Supabase / Postgres)
 -- Ejecutar una vez en Supabase: SQL Editor → New query → pegar → Run.
 
 create extension if not exists pgcrypto;

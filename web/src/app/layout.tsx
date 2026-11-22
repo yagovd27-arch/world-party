@@ -3,7 +3,7 @@ import "@fontsource-variable/inter-tight";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "denoche — eventos y entradas de club",
+  title: "la nit — eventos y entradas de club",
   description: "Encuentra los eventos de los mejores clubs de tu ciudad y compra tus entradas en segundos.",
 };
 

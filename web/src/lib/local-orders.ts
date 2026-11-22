@@ -7,8 +7,8 @@ export type LocalOrder = {
   codes: string[];
 };
 
-const REFS = "denoche-orders";
-const LOCAL = "denoche-local-orders";
+const REFS = "lanit-orders";
+const LOCAL = "lanit-local-orders";
 
 function read<T>(k: string): T[] {
   try { return JSON.parse(localStorage.getItem(k) ?? "[]") as T[]; } catch { return []; }

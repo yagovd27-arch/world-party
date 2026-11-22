@@ -8,7 +8,7 @@ import { TYPE_LABEL } from "@/lib/types";
 
 export async function generateMetadata({ params }: PageProps<"/e/[id]">) {
   const e = await getEvent((await params).id);
-  return { title: e ? `${e.title} · denoche` : "denoche" };
+  return { title: e ? `${e.title} · la nit` : "la nit" };
 }
 
 export default async function EventPage({ params }: PageProps<"/e/[id]">) {

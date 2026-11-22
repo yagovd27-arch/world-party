@@ -1,6 +1,6 @@
-# Denoche
+# La Nit
 
-Denoche — prototipo navegable de una app para encontrar fiestas y eventos en cualquier ciudad: clubes, fiestas privadas y conciertos.
+La Nit — prototipo navegable de una app para encontrar fiestas y eventos en cualquier ciudad: clubes, fiestas privadas y conciertos.
 
 ## Qué incluye
 - **Inicio**: ciudad actual, destacados de la ciudad y ciudades con foto.

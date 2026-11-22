@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#230810">
-<title>Denoche</title>
+<title>la nit</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -448,7 +448,7 @@ function vHome(){
   const day = d => { const x = dateOf(d), has = all.some(e=>e.day===d);
     return `<button class="day ${has?'has':'none'} ${selDay===d?'on':''}" data-day="${d}" aria-pressed="${selDay===d}" aria-label="${groupLabel(d)}${has?'':', sin eventos'}"><small>${d===0?'hoy':WD[x.getDay()]}</small><b>${x.getDate()}</b><i></i></button>`; };
   return `<div class="view">
-    <header class="top"><span class="logo">denoche<b>.</b></span><a class="pill" href="#ciudades">${ic('pin')} ${esc(c.name)}</a></header>
+    <header class="top"><span class="logo">la nit<b>.</b></span><a class="pill" href="#ciudades">${ic('pin')} ${esc(c.name)}</a></header>
     <div class="cal-head"><span>${ic('cal')} ${m0===m1?m0:`${m0} – ${m1}`}</span><span>${all.length} eventos</span></div>
     <div class="days" role="group" aria-label="Calendario">
       <button class="day all ${selDay===null?'on':''}" data-day="all" aria-pressed="${selDay===null}">Todo</button>

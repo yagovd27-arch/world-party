@@ -62,7 +62,7 @@ export default function CheckoutForm({ eventId, items, totalLabel }: { eventId: 
           order_id: data.providerOrderId,
           amount: data.amount,
           currency: data.currency,
-          name: "denoche",
+          name: "la nit",
           description: data.description,
           prefill: { name, email, contact: phone },
           theme: { color: "#230810" },

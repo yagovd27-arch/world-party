@@ -1,7 +1,7 @@
 import BottomNav from "@/components/BottomNav";
 import MyTickets from "./MyTickets";
 
-export const metadata = { title: "Mis entradas · denoche" };
+export const metadata = { title: "Mis entradas · la nit" };
 
 export default function Entradas() {
   return (
