@@ -203,7 +203,7 @@ table.t th { font-size: 12px; color: var(--muted); font-weight: 600; }
 .stat small { font-size: 13px; font-weight: 600; }
 
 /* Perfil: tarjeta de miembro */
-.member { position: relative; overflow: hidden; aspect-ratio: 1.586; border-radius: 14px; padding: 20px 22px; display: flex; flex-direction: column; justify-content: space-between; color: #2a1208; box-shadow: 0 18px 40px -18px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.35); }
+.member { position: relative; overflow: hidden; aspect-ratio: 1.586; max-width: 400px; border-radius: 14px; padding: 20px 22px; display: flex; flex-direction: column; justify-content: space-between; color: #2a1208; box-shadow: 0 18px 40px -18px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.35); }
 .member::before { content: ""; position: absolute; inset: 0; background: linear-gradient(115deg, rgba(255, 255, 255, 0) 30%, rgba(255, 255, 255, 0.28) 46%, rgba(255, 255, 255, 0) 60%); pointer-events: none; }
 .member::after { content: ""; position: absolute; inset: 9px; border: 1px solid currentColor; opacity: 0.18; border-radius: 9px; pointer-events: none; }
 .member > * { position: relative; }
@@ -221,7 +221,7 @@ table.t th { font-size: 12px; color: var(--muted); font-weight: 600; }
 .member-pts span { font-size: 12px; opacity: 0.75; }
 .member-foot { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; font-size: 12px; opacity: 0.85; }
 .member-name { font-size: 14px; font-weight: 600; opacity: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.progress { margin-top: 16px; }
+.progress { margin-top: 16px; max-width: 400px; }
 .progress-txt { display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); margin-bottom: 8px; }
 .progress-txt span:first-child { color: var(--cream); font-weight: 600; }
 .bar { height: 4px; border-radius: 2px; background: var(--line); overflow: hidden; }
