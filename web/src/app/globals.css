@@ -266,3 +266,14 @@ table.t th { font-size: 12px; color: var(--muted); font-weight: 600; }
 .topright { display: flex; align-items: center; gap: 14px; }
 .langsw { font-size: 12px; font-weight: 700; letter-spacing: 0.04em; color: var(--muted); border: 1px solid var(--line); border-radius: var(--r-md); padding: 5px 8px; }
 .langsw:hover { color: var(--cream); border-color: var(--cream-2); }
+
+/* Pago UPI */
+.upi { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 18px; padding: 20px; border: 1px solid var(--line); border-radius: 10px; background: var(--wine-700); }
+.upi img { border-radius: 8px; background: #fff; }
+.upi-amount { font-family: var(--display); font-weight: 500; font-size: 40px; line-height: 1; }
+.vpa { width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 14px; border: 1px dashed rgba(201, 164, 108, 0.45); border-radius: 8px; }
+.vpa b { display: block; font-size: 16px; word-break: break-all; }
+.pending-upi { display: grid; gap: 10px; }
+.pending-upi .card { display: grid; gap: 10px; }
+.pending-upi .row { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.pending-upi .utr { font-size: 17px; font-weight: 700; letter-spacing: 1px; }

@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
 import { DEMO_CITIES, DEMO_EVENTS } from "@/lib/demo";
 import { parts, serviceFee, shortDate, tzFor } from "@/lib/format";
-import { createRazorpayOrder, demoPayments, razorpayKeyId, razorpayOn } from "@/lib/payments";
+import { createRazorpayOrder, demoPayments, razorpayKeyId, razorpayOn, upiOn } from "@/lib/payments";
 import { isSupabaseOn, supabaseAdmin } from "@/lib/supabase/server";
 import { SERVICE_FEE_RATE, type EventItem } from "@/lib/types";
 import { getT } from "@/lib/lang";
+import { confirmOrder } from "@/lib/confirm";
 
 type Body = {
   eventId?: string;
@@ -67,13 +68,14 @@ export async function POST(req: Request) {
   const total = subtotal + fee;
   const currency = event.city.currency;
 
-  if (!razorpayOn && !demoPayments) return bad(m.paymentsOff, 503);
+  const useUpi = !razorpayOn && upiOn && currency === "INR";
+  if (!razorpayOn && !useUpi && !demoPayments) return bad(m.paymentsOff, 503);
 
   const { data: order, error: oErr } = await sb
     .from("orders")
     .insert({
       event_id: event.id, buyer_name: buyer.name, buyer_email: buyer.email, buyer_phone: buyer.phone ?? null,
-      subtotal, service_fee: fee, total, currency, payment_provider: razorpayOn ? "razorpay" : "demo",
+      subtotal, service_fee: fee, total, currency, payment_provider: razorpayOn ? "razorpay" : useUpi ? "upi" : "demo",
     })
     .select("id, access_key")
     .single();
@@ -94,10 +96,12 @@ export async function POST(req: Request) {
     }
   }
 
-  const { error: cErr } = await sb.rpc("confirm_order", { oid: order.id, provider_payment: "demo" });
-  if (cErr) {
+  if (useUpi) return NextResponse.json({ mode: "upi", orderId: order.id, accessKey: order.access_key });
+
+  const conf = await confirmOrder(order.id, "demo", lang);
+  if (!conf.ok) {
     await sb.from("orders").update({ status: "failed" }).eq("id", order.id);
-    return bad(cErr.message.includes("sold_out") ? m.soldOutWhile : m.confirmFailed, 409);
+    return bad(conf.error === "sold_out" ? m.soldOutWhile : m.confirmFailed, 409);
   }
   return NextResponse.json({ mode: "paid", orderId: order.id, accessKey: order.access_key });
 }

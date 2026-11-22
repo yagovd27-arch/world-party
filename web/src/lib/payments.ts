@@ -40,3 +40,20 @@ export function verifyWebhookSignature(body: string, signature: string) {
 }
 
 export const razorpayKeyId = () => KEY_ID!;
+
+/**
+ * Cobro manual por UPI (mientras no haya Razorpay): el comprador paga a este UPI ID,
+ * escribe la referencia del pago y el club lo confirma en el panel.
+ * Se activa poniendo UPI_VPA (y opcionalmente UPI_NAME) en Vercel.
+ */
+export const UPI_VPA = process.env.UPI_VPA?.trim() || "";
+export const UPI_NAME = process.env.UPI_NAME?.trim() || "la nit";
+export const upiOn = Boolean(UPI_VPA) && !razorpayOn;
+
+export function upiUri(amount: number, note: string) {
+  const q = new URLSearchParams({ pa: UPI_VPA, pn: UPI_NAME, am: amount.toFixed(2), cu: "INR", tn: note });
+  return `upi://pay?${q.toString().replace(/\+/g, "%20")}`;
+}
+
+/** Código corto del pedido para el concepto del pago y para buscarlo en el panel. */
+export const orderRef = (id: string) => "LN" + id.replace(/-/g, "").slice(0, 6).toUpperCase();

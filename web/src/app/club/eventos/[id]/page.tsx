@@ -4,7 +4,8 @@ import { requireClub } from "@/lib/auth";
 import { getCity } from "@/lib/data";
 import { dayLabel, money, parts, tzFor } from "@/lib/format";
 import { supabaseServer } from "@/lib/supabase/server";
-import { setEventStatus } from "../../actions";
+import { confirmUpi, rejectUpi, setEventStatus } from "../../actions";
+import { orderRef } from "@/lib/payments";
 import ClubTop from "../../_ui/ClubTop";
 import { getT } from "@/lib/lang";
 
@@ -30,12 +31,18 @@ export default async function ClubEvent({ params, searchParams }: PageProps<"/cl
   if (!/^[0-9a-f-]{36}$/i.test(id)) notFound();
 
   const sb = await supabaseServer();
-  const [{ data: ev }, { data: ord }] = await Promise.all([
+  const [{ data: ev }, { data: ord }, { data: pend }] = await Promise.all([
     sb.from("events").select("id, title, starts_at, status, city_id, image_url, ticket_types(id, name, price, sold, capacity, sort)").eq("id", id).maybeSingle(),
     sb.from("orders")
       .select("id, buyer_name, buyer_email, buyer_phone, subtotal, created_at, order_items(qty, ticket_type:ticket_types(name)), tickets(scanned_at)")
       .eq("event_id", id).eq("status", "paid").order("created_at", { ascending: false }).limit(500),
+    sb.from("orders")
+      .select("id, buyer_name, buyer_email, buyer_phone, total, created_at, provider_payment_id, order_items(qty, ticket_type:ticket_types(name))")
+      .eq("event_id", id).eq("status", "pending").eq("payment_provider", "upi").not("provider_payment_id", "is", null)
+      .order("created_at", { ascending: true }).limit(200),
   ]);
+  type Pending = { id: string; buyer_name: string; buyer_email: string; buyer_phone: string | null; total: number; created_at: string; provider_payment_id: string; order_items: { qty: number; ticket_type: { name: string } }[] };
+  const pending = (pend as unknown as Pending[]) ?? [];
   if (!ev) notFound();
   const e = ev as Ev;
   const orders = (ord as unknown as Order[]) ?? [];
@@ -87,6 +94,31 @@ export default async function ClubEvent({ params, searchParams }: PageProps<"/cl
           <Link href="/club/scan" className="cta ghost">{c.tabScan}</Link>
         </div>
       </section>
+
+      {pending.length > 0 && (
+        <>
+          <h2 className="ghead">{t.upi.pendingTitle(pending.length)}</h2>
+          <div className="section pending-upi" style={{ paddingTop: 10 }}>
+            <p className="fine">{t.upi.pendingHelp}</p>
+            {pending.map((o) => (
+              <div className="card" key={o.id}>
+                <div className="row">
+                  <span><b>{o.buyer_name}</b><span className="fine" style={{ display: "block" }}>{o.buyer_email}{o.buyer_phone ? ` · ${o.buyer_phone}` : ""}</span></span>
+                  <span style={{ textAlign: "right" }}><b>{money(o.total, sym)}</b><span className="fine" style={{ display: "block" }}>{orderRef(o.id)}</span></span>
+                </div>
+                <div className="row">
+                  <span className="utr">UTR {o.provider_payment_id}</span>
+                  <span className="fine">{o.order_items.map((i) => `${i.qty}× ${i.ticket_type.name}`).join(", ")}</span>
+                </div>
+                <div className="actions" style={{ marginTop: 0 }}>
+                  <form action={confirmUpi}><input type="hidden" name="id" value={o.id} /><button className="cta gold block">{t.upi.confirm}</button></form>
+                  <form action={rejectUpi}><input type="hidden" name="id" value={o.id} /><button className="cta ghost block">{t.upi.reject}</button></form>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
 
       <h2 className="ghead">{t.tickets}</h2>
       <div className="section" style={{ paddingTop: 10 }}>

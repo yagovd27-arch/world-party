@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import QRCode from "qrcode";
 import BottomNav from "@/components/BottomNav";
 import { parts, shortDate, tzFor } from "@/lib/format";
@@ -7,7 +7,7 @@ import { isSupabaseOn, supabaseAdmin } from "@/lib/supabase/server";
 import { getT } from "@/lib/lang";
 
 type Row = {
-  id: string; status: string; buyer_name: string;
+  id: string; status: string; buyer_name: string; payment_provider: string | null;
   event: { title: string; starts_at: string; city_id: string; club: { name: string; area: string | null } };
   tickets: { code: string; scanned_at: string | null; ticket_type: { name: string } }[];
 };
@@ -20,12 +20,13 @@ export default async function TicketPage({ params, searchParams }: PageProps<"/t
 
   const { data } = await supabaseAdmin()
     .from("orders")
-    .select("id, status, buyer_name, event:events(title, starts_at, city_id, club:clubs(name, area)), tickets(code, scanned_at, ticket_type:ticket_types(name))")
+    .select("id, status, buyer_name, payment_provider, event:events(title, starts_at, city_id, club:clubs(name, area)), tickets(code, scanned_at, ticket_type:ticket_types(name))")
     .eq("id", id)
     .eq("access_key", key)
     .maybeSingle();
   if (!data) notFound();
   const o = data as unknown as Row;
+  if (o.status !== "paid" && o.payment_provider === "upi") redirect(`/pagar/${o.id}?k=${key}`);
   const tz = tzFor(o.event.city_id);
   const { lang, t } = await getT();
   const qrs = await Promise.all(o.tickets.map((t) => QRCode.toDataURL(t.code, { margin: 1, width: 400, color: { dark: "#19050b", light: "#f5ebda" } })));

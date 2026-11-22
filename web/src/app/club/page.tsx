@@ -91,6 +91,9 @@ export default async function ClubHome({ searchParams }: PageProps<"/club">) {
     .order("starts_at", { ascending: false })
     .limit(100);
   const events = (data as Ev[]) ?? [];
+  const { count: pendingUpi } = await sb.from("orders").select("id", { count: "exact", head: true })
+    .in("event_id", events.map((e) => e.id).concat("00000000-0000-0000-0000-000000000000"))
+    .eq("status", "pending").eq("payment_provider", "upi").not("provider_payment_id", "is", null);
   const cities = await getCities();
   const clubCity = cities.find((x) => x.id === club.city_id);
   const sym = clubCity?.currency_symbol ?? "";
@@ -138,6 +141,7 @@ export default async function ClubHome({ searchParams }: PageProps<"/club">) {
             <button className="pill">{c.switch}</button>
           </form>
         )}
+        {(pendingUpi ?? 0) > 0 && <p className="notice">{t.upi.pendingNotice(pendingUpi ?? 0)}</p>}
         {!club.verified && (
           <p className="notice">{c.pending}</p>
         )}

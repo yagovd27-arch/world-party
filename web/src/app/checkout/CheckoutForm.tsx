@@ -22,7 +22,7 @@ function loadRazorpay(): Promise<boolean> {
   });
 }
 
-export default function CheckoutForm({ eventId, items, totalLabel, defaultEmail }: { eventId: string; items: { id: string; qty: number }[]; totalLabel: string; defaultEmail: string }) {
+export default function CheckoutForm({ eventId, items, totalLabel, defaultEmail, note }: { eventId: string; items: { id: string; qty: number }[]; totalLabel: string; defaultEmail: string; note?: string }) {
   const router = useRouter();
   const t = useT();
   const [name, setName] = useState("");
@@ -55,6 +55,11 @@ export default function CheckoutForm({ eventId, items, totalLabel, defaultEmail 
       if (data.mode === "paid") {
         saveOrderRef({ id: data.orderId, key: data.accessKey });
         router.push(`/t/${data.orderId}?k=${data.accessKey}&nuevo=1`);
+        return;
+      }
+      if (data.mode === "upi") {
+        saveOrderRef({ id: data.orderId, key: data.accessKey });
+        router.push(`/pagar/${data.orderId}?k=${data.accessKey}`);
         return;
       }
       if (data.mode === "razorpay") {
@@ -99,7 +104,7 @@ export default function CheckoutForm({ eventId, items, totalLabel, defaultEmail 
       <div className="field"><label htmlFor="ph">{t.phoneWa}</label><input id="ph" type="tel" autoComplete="tel" value={phone} onChange={(e) => setPhone(e.target.value)} /></div>
       <button className="cta block gold" disabled={busy}>{busy ? t.processing : t.payX(totalLabel)}</button>
       {err && <p className="error" role="alert">{err}</p>}
-      <p className="fine" style={{ marginTop: 12, textAlign: "center" }}>{t.payNote}</p>
+      <p className="fine" style={{ marginTop: 12, textAlign: "center" }}>{note ?? t.payNote}</p>
     </form>
   );
 }

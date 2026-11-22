@@ -6,6 +6,7 @@ import { getUser, isAdmin } from "@/lib/auth";
 import { tzFor, zonedToUtc } from "@/lib/format";
 import { supabaseAdmin, supabaseServer } from "@/lib/supabase/server";
 import { getT } from "@/lib/lang";
+import { confirmOrder } from "@/lib/confirm";
 
 const str = (f: FormData, k: string, max = 200) => String(f.get(k) ?? "").trim().slice(0, max);
 const UUID = /^[0-9a-f-]{36}$/i;
@@ -185,4 +186,31 @@ export async function signOutClub() {
   await sb.auth.signOut();
   (await cookies()).delete("club");
   redirect("/club");
+}
+
+/** Pagos UPI: el club confirma (se emiten y envían las entradas) o rechaza. */
+async function upiOrderForMember(orderId: string) {
+  if (!UUID.test(orderId)) return null;
+  const sb = await supabaseServer(); // las reglas de seguridad solo dejan ver pedidos de tus clubs
+  const { data } = await sb.from("orders").select("id, event_id, status, payment_provider").eq("id", orderId).maybeSingle();
+  return data && data.payment_provider === "upi" && data.status === "pending" ? data : null;
+}
+
+export async function confirmUpi(form: FormData) {
+  const id = str(form, "id", 40);
+  const o = await upiOrderForMember(id);
+  if (!o) redirect("/club");
+  const { lang, t } = await getT();
+  const res = await confirmOrder(o.id, (await supabaseAdmin().from("orders").select("provider_payment_id").eq("id", o.id).single()).data?.provider_payment_id ?? "upi", lang);
+  revalidatePath(`/club/eventos/${o.event_id}`);
+  redirect(`/club/eventos/${o.event_id}${res.ok ? "" : "?e=" + encodeURIComponent(t.upi.eConfirm)}`);
+}
+
+export async function rejectUpi(form: FormData) {
+  const id = str(form, "id", 40);
+  const o = await upiOrderForMember(id);
+  if (!o) redirect("/club");
+  await supabaseAdmin().from("orders").update({ status: "failed" }).eq("id", o.id).eq("status", "pending");
+  revalidatePath(`/club/eventos/${o.event_id}`);
+  redirect(`/club/eventos/${o.event_id}`);
 }
