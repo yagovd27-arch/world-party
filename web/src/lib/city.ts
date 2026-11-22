@@ -1,5 +1,6 @@
 import "server-only";
 import { cookies, headers } from "next/headers";
+import { getEventCounts } from "./data";
 import type { City } from "./types";
 
 /** Centro aproximado de cada ciudad, para elegir la más cercana al visitante. */
@@ -32,13 +33,18 @@ export async function currentCity(cities: City[]): Promise<{ city: City | undefi
   const lat = Number(h.get("x-vercel-ip-latitude"));
   const lng = Number(h.get("x-vercel-ip-longitude"));
   if (h.get("x-vercel-ip-latitude") && Number.isFinite(lat) && Number.isFinite(lng)) {
-    let best: City | undefined;
-    let bestKm = Infinity;
-    for (const c of cities) {
-      const p = COORDS[c.id];
-      if (!p) continue;
-      const d = km([lat, lng], p);
-      if (d < bestKm) { bestKm = d; best = c; }
+    const near = cities
+      .filter((c) => COORDS[c.id])
+      .map((c) => ({ c, d: km([lat, lng], COORDS[c.id]) }))
+      .sort((a, b) => a.d - b.d);
+    let best = near[0]?.c;
+    // Ciudades vecinas (p. ej. Delhi y Gurugram): la ubicación por IP no distingue bien,
+    // así que entre las que están a menos de 80 km elegimos la que tiene más eventos.
+    if (near.length > 1 && near[1].d - near[0].d < 80) {
+      const counts = await getEventCounts();
+      const close = near.filter((x) => x.d - near[0].d < 80);
+      close.sort((a, b) => (counts[b.c.id] ?? 0) - (counts[a.c.id] ?? 0) || a.d - b.d);
+      best = close[0].c;
     }
     if (best) return { city: best, detected: true };
   }
