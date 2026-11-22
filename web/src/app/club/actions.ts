@@ -174,3 +174,11 @@ export async function verifyClub(form: FormData) {
   revalidatePath("/club/admin");
   redirect("/club/admin");
 }
+
+/** Cerrar sesión (POST: los enlaces no pueden cerrarla al precargarse). */
+export async function signOutClub() {
+  const sb = await supabaseServer();
+  await sb.auth.signOut();
+  (await cookies()).delete("club");
+  redirect("/club");
+}
