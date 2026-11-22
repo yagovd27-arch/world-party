@@ -8,7 +8,8 @@ import { NextResponse, type NextRequest } from "next/server";
 export async function proxy(request: NextRequest) {
   const host = request.headers.get("host") ?? "";
   const path = request.nextUrl.pathname;
-  const clubsHost = host.startsWith("clubs.") && !path.startsWith("/club") && !path.startsWith("/api");
+  const shared = ["/club", "/api", "/auth", "/e/", "/t/", "/c/"];
+  const clubsHost = host.startsWith("clubs.") && !shared.some((p) => path.startsWith(p));
   const url = request.nextUrl.clone();
   if (clubsHost) url.pathname = path === "/" ? "/club" : `/club${path}`;
   const next = () => (clubsHost ? NextResponse.rewrite(url, { request }) : NextResponse.next({ request }));
