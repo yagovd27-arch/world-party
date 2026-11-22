@@ -62,6 +62,18 @@ function MemberCard({ lvl, name, since, number, points }: { lvl: (typeof LEVELS)
   );
 }
 
+function ForClubs() {
+  return (
+    <a className="forclubs" href="https://clubs.lanit.club">
+      <span>
+        <b>la nit<i>.</i> <em>for clubs</em></b>
+        <small>¿Tienes un club o montas fiestas? Vende tus entradas aquí.</small>
+      </span>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg>
+    </a>
+  );
+}
+
 export default async function Perfil() {
   const user = await getUser();
 
@@ -81,9 +93,7 @@ export default async function Perfil() {
           </p>
           <LoginForm next="/perfil" />
         </section>
-        <p className="fine section" style={{ textAlign: "center", paddingTop: 36 }}>
-          ¿Tienes un club? <Link href="/club" style={{ textDecoration: "underline" }}>la nit for clubs</Link>
-        </p>
+        <section className="section" style={{ paddingTop: 30 }}><ForClubs /></section>
         <BottomNav />
       </main>
     );
@@ -142,9 +152,9 @@ export default async function Perfil() {
           <Link href="/entradas"><span>Mis entradas</span><span className="muted">{h.tickets}</span></Link>
           <Link href="/ciudades"><span>Ciudad</span><span className="muted">{city?.name ?? "Elegir"}</span></Link>
           <div><span>Email</span><span className="muted trunc">{email}</span></div>
-          <Link href="/club"><span>la nit for clubs</span><span className="muted">Para clubs</span></Link>
         </nav>
-        <div style={{ marginTop: 18 }}><SignOut to="/perfil" /></div>
+        <div style={{ marginTop: 18 }}><ForClubs /></div>
+        <div style={{ marginTop: 12 }}><SignOut to="/perfil" /></div>
       </section>
       <BottomNav />
     </main>
