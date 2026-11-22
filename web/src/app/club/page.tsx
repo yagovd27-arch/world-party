@@ -28,7 +28,7 @@ export default async function ClubHome({ searchParams }: PageProps<"/club">) {
       <>
         <ClubTop loggedIn={false} />
         <section className="section" style={{ maxWidth: 520 }}>
-          <h1 style={{ fontFamily: "var(--display)", fontSize: 56, fontWeight: 400, lineHeight: 1, letterSpacing: 0 }}>Vende tus entradas sin pagar nada</h1>
+          <h1 style={{ fontFamily: "var(--display)", fontSize: 48, fontWeight: 500, lineHeight: 1, letterSpacing: 0 }}>Vende tus entradas sin pagar nada</h1>
           <p className="desc">Publica tu evento en tres minutos y compártelo en Instagram. El dinero de cada entrada es para el club.</p>
           <dl className="facts" style={{ margin: "22px 0 26px" }}>
             <div><dt>Ventas</dt><dd>Las ves en tiempo real, entrada a entrada.</dd></div>
