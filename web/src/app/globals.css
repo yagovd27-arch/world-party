@@ -277,3 +277,14 @@ table.t th { font-size: 12px; color: var(--muted); font-weight: 600; }
 .pending-upi .card { display: grid; gap: 10px; }
 .pending-upi .row { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
 .pending-upi .utr { font-size: 17px; font-weight: 700; letter-spacing: 1px; }
+
+/* Páginas legales */
+.legal article { max-width: 68ch; }
+.legal h2 { font-family: var(--display); font-weight: 500; font-size: 20px; margin: 26px 0 8px; letter-spacing: 0; }
+.legal p, .legal li { font-size: 15px; line-height: 1.65; color: var(--cream-2); }
+.legal p + p { margin-top: 10px; }
+.legal ul { padding-left: 20px; margin: 8px 0; }
+.legal a { text-decoration: underline; }
+.legal-nav { display: flex; flex-wrap: wrap; gap: 8px 18px; margin: 36px 0 10px; padding-top: 16px; border-top: 1px solid var(--line); font-size: 13px; }
+.legal-nav a { color: var(--muted); }
+.footer-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 16px; padding: 30px 20px 10px; font-size: 12px; color: var(--muted); }

@@ -8,6 +8,16 @@ import { getCities } from "@/lib/data";
 import { cityName, type Dict } from "@/lib/i18n";
 import { getT } from "@/lib/lang";
 import LangSwitch from "@/components/LangSwitch";
+import { legalReady } from "@/lib/legal";
+
+function LegalLinks() {
+  if (!legalReady) return null;
+  return (
+    <nav className="footer-links" aria-label="Legal">
+      <Link href="/terms">Terms</Link><Link href="/privacy">Privacy</Link><Link href="/refunds">Refunds</Link><Link href="/contact">Contact</Link>
+    </nav>
+  );
+}
 import { supabaseAdmin } from "@/lib/supabase/server";
 
 export async function generateMetadata() {
@@ -101,6 +111,7 @@ export default async function Perfil() {
           <LoginForm next="/perfil" />
         </section>
         <section className="section" style={{ paddingTop: 30 }}><ForClubs t={t} /></section>
+        <LegalLinks />
         <BottomNav />
       </main>
     );
@@ -163,6 +174,7 @@ export default async function Perfil() {
         <div style={{ marginTop: 18 }}><ForClubs t={t} /></div>
         <div style={{ marginTop: 12 }}><SignOut to="/perfil" /></div>
       </section>
+      <LegalLinks />
       <BottomNav />
     </main>
   );
