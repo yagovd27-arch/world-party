@@ -25,12 +25,15 @@ export async function generateMetadata() {
   return { title: `${t.nav.profile} · la nit` };
 }
 
-const PTS_PER_TICKET = 100;
+/** 23 puntos por cada ₹100 gastados en entradas (en México, por cada $20, que es lo mismo aprox.). */
+const PTS = 23;
+const PER: Record<string, number> = { INR: 100, MXN: 20 };
+const ptsFor = (amount: number, currency: string) => Math.floor((amount / (PER[currency] ?? 100)) * PTS);
 const LEVELS = [
   { id: "bronce", at: 0 },
-  { id: "plata", at: 1000 },
-  { id: "oro", at: 2500 },
-  { id: "black", at: 5000 },
+  { id: "plata", at: 1150 },
+  { id: "oro", at: 3450 },
+  { id: "black", at: 9200 },
 ];
 
 function level(points: number) {
@@ -41,18 +44,19 @@ function level(points: number) {
   return { cur, next, pct };
 }
 
-type Row = { event: { id: string; city_id: string }; tickets: { id: string }[] };
+type Row = { subtotal: number; currency: string; event: { id: string; city_id: string }; tickets: { id: string }[] };
 
 async function history(email: string) {
   const { data } = await supabaseAdmin()
     .from("orders")
-    .select("event:events(id, city_id), tickets(id)")
+    .select("subtotal, currency, event:events(id, city_id), tickets(id)")
     .ilike("buyer_email", email)
     .eq("status", "paid")
     .limit(500);
   const rows = (data as unknown as Row[]) ?? [];
   return {
     tickets: rows.reduce((s, r) => s + r.tickets.length, 0),
+    points: rows.reduce((s, r) => s + ptsFor(r.subtotal, r.currency), 0),
     events: new Set(rows.map((r) => r.event.id)).size,
     cities: new Set(rows.map((r) => r.event.city_id)).size,
   };
@@ -106,7 +110,7 @@ export default async function Perfil() {
           </div>
           <h1 className="ptitle">{t.login.title}</h1>
           <p className="muted" style={{ fontSize: 14, margin: "6px 0 18px", lineHeight: 1.5 }}>
-            {p.intro(PTS_PER_TICKET)}
+            {p.intro(PTS)}
           </p>
           <LoginForm next="/perfil" />
         </section>
@@ -118,9 +122,9 @@ export default async function Perfil() {
   }
 
   const email = user.email ?? "";
-  const [h, cities] = await Promise.all([email ? history(email) : Promise.resolve({ tickets: 0, events: 0, cities: 0 }), getCities()]);
+  const [h, cities] = await Promise.all([email ? history(email) : Promise.resolve({ tickets: 0, points: 0, events: 0, cities: 0 }), getCities()]);
   const { city } = await currentCity(cities);
-  const points = h.tickets * PTS_PER_TICKET;
+  const points = h.points;
   const { cur, next, pct } = level(points);
   const created = new Date(user.created_at);
   const since = t.memberSince(t.mo[created.getUTCMonth()], created.getUTCFullYear());
@@ -161,7 +165,7 @@ export default async function Perfil() {
             </li>
           ))}
         </ol>
-        <p className="fine" style={{ marginTop: 10 }}>{p.howPoints(PTS_PER_TICKET)}</p>
+        <p className="fine" style={{ marginTop: 10 }}>{p.howPoints(PTS)}</p>
       </section>
 
       <section className="section">
