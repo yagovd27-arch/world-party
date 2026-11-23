@@ -30,6 +30,15 @@ export async function createClub(form: FormData) {
   const { count } = await admin.from("club_members").select("club_id", { count: "exact", head: true }).eq("user_id", user.id).eq("role", "owner");
   if ((count ?? 0) >= 5) redirect("/club?e=" + encodeURIComponent(c.eMax));
 
+  // Doble envío del formulario: si ya tiene un club con ese nombre, entra en él en vez de crear otro.
+  const { data: mine } = await admin.from("club_members").select("club:clubs(id, name)").eq("user_id", user.id);
+  const same = ((mine as unknown as { club: { id: string; name: string } | null }[]) ?? [])
+    .map((m) => m.club).find((k) => k && k.name.trim().toLowerCase() === name.trim().toLowerCase());
+  if (same) {
+    (await cookies()).set("club", same.id, { path: "/", maxAge: 60 * 60 * 24 * 365, sameSite: "lax" });
+    redirect("/club");
+  }
+
   const { data: club, error } = await admin.from("clubs").insert({ name, city_id, area, instagram, phone }).select("id").single();
   if (error || !club) {
     console.error("[createClub] insert club", error);
