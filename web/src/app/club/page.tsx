@@ -64,7 +64,7 @@ export default async function ClubHome({ searchParams }: PageProps<"/club">) {
             <div className="row2">
               <div className="field">
                 <label htmlFor="city">{c.city}</label>
-                <select id="city" name="city" required defaultValue={cities.find((x) => x.id === "gurugram")?.id ?? cities[0]?.id}>
+                <select id="city" name="city" required defaultValue={cities.find((x) => x.id === "delhi")?.id ?? cities[0]?.id}>
                   {cities.map((x) => <option key={x.id} value={x.id}>{cityName(x, lang)}</option>)}
                 </select>
               </div>

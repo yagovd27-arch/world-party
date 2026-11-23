@@ -6,7 +6,6 @@ import type { City } from "./types";
 /** Centro aproximado de cada ciudad, para elegir la más cercana al visitante. */
 const COORDS: Record<string, [number, number]> = {
   delhi: [28.6139, 77.209],
-  gurugram: [28.4595, 77.0266],
   puebla: [19.0414, -98.2063],
   cdmx: [19.4326, -99.1332],
   monterrey: [25.6866, -100.3161],
@@ -38,7 +37,7 @@ export async function currentCity(cities: City[]): Promise<{ city: City | undefi
       .map((c) => ({ c, d: km([lat, lng], COORDS[c.id]) }))
       .sort((a, b) => a.d - b.d);
     let best = near[0]?.c;
-    // Ciudades vecinas (p. ej. Delhi y Gurugram): la ubicación por IP no distingue bien,
+    // Ciudades vecinas (p. ej. dos ciudades cercanas): la ubicación por IP no distingue bien,
     // así que entre las que están a menos de 80 km elegimos la que tiene más eventos.
     if (near.length > 1 && near[1].d - near[0].d < 80) {
       const counts = await getEventCounts();

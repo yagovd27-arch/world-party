@@ -18,7 +18,7 @@ const es = {
   hour: (t: string) => `${t} h`,
 
   // General
-  meta: { title: "la nit — fiestas y entradas de club en Delhi y Gurugram", desc: "Encuentra los eventos de los mejores clubs de tu ciudad y compra tus entradas en segundos." },
+  meta: { title: "la nit — fiestas y entradas de club en Delhi, CDMX y Puebla", desc: "Encuentra los eventos de los mejores clubs de tu ciudad y compra tus entradas en segundos." },
   nav: { events: "Eventos", tickets: "Entradas", myTickets: "Mis entradas", profile: "Perfil", main: "Principal" },
   back: "Volver",
   cityAria: (c: string) => `Ciudad: ${c}. Cambiar ciudad`,
@@ -376,7 +376,7 @@ const en: Dict = {
   memberSince: (m, y) => `${m} ${y}`,
   hour: (t) => t,
 
-  meta: { title: "la nit — club nights and party tickets in Delhi & Gurugram", desc: "Find events at the best clubs in Delhi and Gurugram and get your tickets in seconds." },
+  meta: { title: "la nit — club nights and party tickets in Delhi", desc: "Find events at the best clubs in Delhi NCR and get your tickets in seconds." },
   nav: { events: "Events", tickets: "Tickets", myTickets: "My tickets", profile: "Profile", main: "Main" },
   back: "Back",
   cityAria: (c) => `City: ${c}. Change city`,
@@ -706,7 +706,7 @@ export const DICTS: Record<Lang, Dict> = { es, en };
 export const dict = (lang: Lang): Dict => DICTS[lang];
 
 /** Nombres de ciudad y país en cada idioma (en la base de datos están en español). */
-const CITY_EN: Record<string, string> = { delhi: "New Delhi", cdmx: "Mexico City" };
+const CITY_EN: Record<string, string> = { delhi: "Delhi", cdmx: "Mexico City" };
 const COUNTRY_EN: Record<string, string> = { "México": "Mexico" };
 export function cityName(c: { id: string; name: string }, lang: Lang) {
   return lang === "en" ? CITY_EN[c.id] ?? c.name : c.name;

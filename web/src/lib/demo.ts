@@ -7,8 +7,7 @@ import type { City, EventItem, TicketType } from "./types";
 const IMG = (id: string) => `https://images.unsplash.com/${id}?auto=format&fit=crop&w=900&q=70`;
 
 export const DEMO_CITIES: City[] = [
-  { id: "delhi", name: "Nueva Delhi", country: "India", currency: "INR", currency_symbol: "₹", image_url: IMG("photo-1587474260584-136574528ed5") },
-  { id: "gurugram", name: "Gurugram", country: "India", currency: "INR", currency_symbol: "₹", image_url: IMG("photo-1589829973523-e4ddcbbd40e7") },
+  { id: "delhi", name: "Delhi", country: "India", currency: "INR", currency_symbol: "₹", image_url: IMG("photo-1587474260584-136574528ed5") },
   { id: "puebla", name: "Puebla", country: "México", currency: "MXN", currency_symbol: "$", image_url: IMG("photo-1653661279002-692227e35f0f") },
   { id: "cdmx", name: "Ciudad de México", country: "México", currency: "MXN", currency_symbol: "$", image_url: IMG("photo-1599067821475-c47c29093bf7") },
   { id: "monterrey", name: "Monterrey", country: "México", currency: "MXN", currency_symbol: "$", image_url: IMG("photo-1561158250-01426799e9e0") },
@@ -34,9 +33,9 @@ const tiers = (eventId: string, p: [number, number, number], earlyLeft: number, 
 type Seed = [id: string, city: string, club: string, area: string, title: string, day: number, time: string, img: string, desc: string, lineup: string[], prices: [number, number, number], earlyLeft: number, vip: string, type?: EventItem["type"]];
 
 const SEEDS: Seed[] = [
-  ["la-desgracia-navidad", "gurugram", "LA DESGRACIA", "Gurugram", "LA DESGRACIA · Navidad", 21, "22:00", "photo-1517263904808-5dc91e3e7044", "Segunda edición de LA DESGRACIA, en versión navideña: música toda la noche y dress code rojo.", ["DJ invitado", "Open decks"], [799, 1199, 3999], 0, "Mesa reservada", "fiesta"],
-  ["neon-saturdays", "gurugram", "Club Aurora", "Sector 29", "Neon Saturdays", 0, "23:00", "photo-1764510377343-e5b12385791b", "House y tech house hasta que cierre el club.", ["DJ residente", "Invitado sorpresa"], [799, 1199, 3999], 18, "Mesa reservada · barra exclusiva"],
-  ["rooftop-sunset", "gurugram", "Terraza Kaya", "Cyber Hub", "Rooftop Sunset Sessions", 1, "18:30", "photo-1758810409996-583f3bad7d51", "Atardecer, cócteles y deep house con vista a la ciudad.", ["Sunset DJ set"], [799, 1199, 3999], 9, "Mesa en terraza"],
+  ["la-desgracia-navidad", "delhi", "LA DESGRACIA", "Gurugram", "LA DESGRACIA · Navidad", 21, "22:00", "photo-1517263904808-5dc91e3e7044", "Segunda edición de LA DESGRACIA, en versión navideña: música toda la noche y dress code rojo.", ["DJ invitado", "Open decks"], [799, 1199, 3999], 0, "Mesa reservada", "fiesta"],
+  ["neon-saturdays", "delhi", "Club Aurora", "Sector 29", "Neon Saturdays", 0, "23:00", "photo-1764510377343-e5b12385791b", "House y tech house hasta que cierre el club.", ["DJ residente", "Invitado sorpresa"], [799, 1199, 3999], 18, "Mesa reservada · barra exclusiva"],
+  ["rooftop-sunset", "delhi", "Terraza Kaya", "Cyber Hub", "Rooftop Sunset Sessions", 1, "18:30", "photo-1758810409996-583f3bad7d51", "Atardecer, cócteles y deep house con vista a la ciudad.", ["Sunset DJ set"], [799, 1199, 3999], 9, "Mesa en terraza"],
   ["bergamo-saturdays", "delhi", "Bergamo", "Vasant Kunj", "Bergamo Saturdays", 0, "22:30", "photo-1764510377343-e5b12385791b", "Hip-hop y lo más sonado del momento.", ["DJ residente"], [1499, 1999, 9999], 14, "Mesa para 4 · botella incluida"],
   ["bulach-nights", "delhi", "Bulach", "Qutab Institutional Area", "Bulach Nights", 1, "22:00", "photo-1763757575623-ffafe0867aa3", "Cócteles, ambiente mediterráneo y DJ hasta tarde.", ["DJ invitado"], [999, 1499, 7999], 20, "Mesa reservada"],
   ["bohca-weekend", "delhi", "Bohca", "Adchini", "Bohca Weekend", 2, "23:00", "photo-1578736641330-3155e606cd40", "Pista llena y música comercial toda la noche.", ["DJ residente"], [1299, 1799, 8999], 0, "Mesa VIP junto a cabina"],
