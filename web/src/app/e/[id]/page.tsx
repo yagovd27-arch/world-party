@@ -34,6 +34,7 @@ export default async function EventPage({ params }: PageProps<"/e/[id]">) {
   const tz = tzFor(e.city_id);
   const { lang, t } = await getT();
   const cname = cityName(city, lang);
+  const ig = e.club.instagram?.replace(/^@/, "").replace(/^https?:\/\/(www\.)?instagram\.com\//, "").replace(/\/$/, "") || "";
 
   const p = parts(e.starts_at, tz);
   const kind = t.kind[e.type] ?? e.type;
@@ -61,6 +62,9 @@ export default async function EventPage({ params }: PageProps<"/e/[id]">) {
         </a>
         <dl className="facts">
           <div><dt>{t.when}</dt><dd>{dayLabel(e.starts_at, tz, lang)}<span>{t.doorsAt(p.time)}</span></dd></div>
+          {ig && (
+            <div><dt>Instagram</dt><dd><a href={`https://instagram.com/${ig}`} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "underline" }}>@{ig}</a></dd></div>
+          )}
           {e.dress_code && <div><dt>{t.dressCode}</dt><dd>{e.dress_code}</dd></div>}
           {e.lineup.length > 0 && <div><dt>{t.lineup}</dt><dd>{e.lineup.join(", ")}</dd></div>}
         </dl>

@@ -34,7 +34,7 @@ export type EventItem = {
   min_age: number;
   dress_code: string | null;
   status: "draft" | "published" | "cancelled";
-  club: { name: string; area: string | null; address?: string | null; verified: boolean };
+  club: { name: string; area: string | null; address?: string | null; instagram?: string | null; verified: boolean };
   ticket_types: TicketType[];
 };
 
