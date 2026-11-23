@@ -5,7 +5,7 @@ import { money } from "@/lib/format";
 import type { TicketType } from "@/lib/types";
 import { useT } from "@/components/LangProvider";
 
-export default function TicketPicker({ eventId, symbol, tiers }: { eventId: string; symbol: string; tiers: TicketType[] }) {
+export default function TicketPicker({ eventId, symbol, tiers, salesOn = true }: { eventId: string; symbol: string; tiers: TicketType[]; salesOn?: boolean }) {
   const router = useRouter();
   const tr = useT();
   const [q, setQ] = useState<Record<string, number>>({});
@@ -34,7 +34,7 @@ export default function TicketPicker({ eventId, symbol, tiers }: { eventId: stri
                 <div className="pr">{money(t.price, symbol)}</div>
                 <div className="nt">{out ? tr.soldOut : [t.description, left <= 20 ? tr.left(left) : ""].filter(Boolean).join(". ")}</div>
               </div>
-              {out ? null : (
+              {out || !salesOn ? null : (
                 <div className="step">
                   <button type="button" onClick={() => change(t, -1)} disabled={!n} aria-label={tr.remove(t.name)}>−</button>
                   <b aria-live="polite">{n}</b>
@@ -45,6 +45,9 @@ export default function TicketPicker({ eventId, symbol, tiers }: { eventId: stri
           );
         })}
       </div>
+      {!salesOn ? (
+        <p className="notice" style={{ marginTop: 16 }}>{tr.salesSoon}</p>
+      ) : (
       <div className="buybar">
         <div className="tot">
           <span>{count ? tr.nTickets(count) : tr.pickTickets}</span>
@@ -52,6 +55,7 @@ export default function TicketPicker({ eventId, symbol, tiers }: { eventId: stri
         </div>
         <button type="button" className="cta" disabled={!count} onClick={buy}>{tr.continue}</button>
       </div>
+      )}
     </>
   );
 }

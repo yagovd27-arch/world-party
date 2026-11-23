@@ -56,4 +56,10 @@ export function upiUri(amount: number, note: string) {
 }
 
 /** Código corto del pedido para el concepto del pago y para buscarlo en el panel. */
+/** ¿Se puede vender online en esta moneda ahora mismo? Razorpay y UPI solo cobran en rupias. */
+export function canSell(currency: string) {
+  if (demoPayments) return true;
+  return currency === "INR" && (razorpayOn || Boolean(UPI_VPA));
+}
+
 export const orderRef = (id: string) => "LN" + id.replace(/-/g, "").slice(0, 6).toUpperCase();

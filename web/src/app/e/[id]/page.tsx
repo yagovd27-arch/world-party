@@ -3,6 +3,7 @@ import Link from "next/link";
 import Pin from "@/components/Pin";
 import { notFound } from "next/navigation";
 import TicketPicker from "./TicketPicker";
+import { canSell } from "@/lib/payments";
 import { getCity, getEvent } from "@/lib/data";
 import { dayLabel, parts, tzFor } from "@/lib/format";
 import { cityName } from "@/lib/i18n";
@@ -65,7 +66,7 @@ export default async function EventPage({ params }: PageProps<"/e/[id]">) {
         </dl>
         {e.description && <p className="desc">{e.description}</p>}
         <h2 className="etickets">{t.tickets}</h2>
-        <TicketPicker eventId={e.id} symbol={city.currency_symbol} tiers={e.ticket_types} />
+        <TicketPicker eventId={e.id} symbol={city.currency_symbol} tiers={e.ticket_types} salesOn={canSell(city.currency)} />
       </div>
     </main>
   );

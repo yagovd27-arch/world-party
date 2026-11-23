@@ -56,6 +56,7 @@ const es = {
   nTickets: (n: number) => (n === 1 ? "1 entrada" : `${n} entradas`),
   pickTickets: "Elige tus entradas",
   continue: "Continuar",
+  salesSoon: "La venta online de entradas abre muy pronto. Mientras tanto, escribe al club para reservar.",
 
   // Ciudades
   chooseCity: "Elige ciudad",
@@ -412,6 +413,7 @@ const en: Dict = {
   nTickets: (n) => (n === 1 ? "1 ticket" : `${n} tickets`),
   pickTickets: "Choose your tickets",
   continue: "Continue",
+  salesSoon: "Online ticket sales open very soon. Until then, message the club to book.",
 
   chooseCity: "Choose city",
   yourCity: "Your city",
