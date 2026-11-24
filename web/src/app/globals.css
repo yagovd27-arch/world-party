@@ -288,3 +288,53 @@ table.t th { font-size: 12px; color: var(--muted); font-weight: 600; }
 .legal-nav { display: flex; flex-wrap: wrap; gap: 8px 18px; margin: 36px 0 10px; padding-top: 16px; border-top: 1px solid var(--line); font-size: 13px; }
 .legal-nav a { color: var(--muted); }
 .footer-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 16px; padding: 30px 20px 10px; font-size: 12px; color: var(--muted); }
+
+/* PRs */
+.prpoints { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+.prpoints li { padding: 11px 0 11px 18px; border-bottom: 1px solid var(--line); font-size: 14px; line-height: 1.45; color: var(--cream-2); position: relative; }
+.prpoints li::before { content: ""; position: absolute; left: 2px; top: 18px; width: 6px; height: 6px; border-radius: 50%; background: var(--gold); }
+.prcard { position: relative; overflow: hidden; aspect-ratio: 1.586; max-width: 400px; border-radius: 14px; padding: 20px 22px; display: flex; flex-direction: column; justify-content: space-between; color: var(--cream); box-shadow: 0 18px 40px -18px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.18); }
+.prcard::after { content: ""; position: absolute; inset: 9px; border: 1px solid currentColor; opacity: 0.16; border-radius: 9px; pointer-events: none; }
+.prcard > * { position: relative; }
+.prcard .member-logo small { font-size: 12px; font-weight: 700; letter-spacing: 0.14em; opacity: 0.7; margin-left: 4px; }
+.prcode { font-family: var(--display); font-weight: 500; font-size: 40px; line-height: 1; letter-spacing: 0.06em; overflow-wrap: anywhere; }
+.prcard.pr-starter, .swatch.pr-starter { background: linear-gradient(135deg, #3a0e1b 0%, #5c1a2d 55%, #2e0a15 100%); }
+.prcard.pr-rising, .swatch.pr-rising { background: linear-gradient(135deg, #6d1630 0%, #b23a58 50%, #6a1430 100%); }
+.prcard.pr-headliner, .swatch.pr-headliner { background: linear-gradient(135deg, #4a2410 0%, #c9a46c 52%, #5a2e12 100%); }
+.prcard.pr-headliner { color: #1f0b05; }
+.prcard.pr-legend, .swatch.pr-legend { background: radial-gradient(120% 140% at 85% 10%, rgba(201, 164, 108, 0.45), transparent 55%), linear-gradient(135deg, #0b0a0c 0%, #241d22 55%, #0d0b0d 100%); }
+.prcard.pr-legend { color: var(--gold-2); }
+.copylink { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 6px; padding: 10px 10px 10px 14px; background: var(--wine-700); border: 1px solid var(--line); border-radius: var(--r-md); }
+.copylink code { font-size: 14px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.copylink .pill { flex-shrink: 0; }
+.prlinks > div { padding: 12px 0; border-bottom: 1px solid var(--line); }
+.prlinks > div:first-child { border-top: 1px solid var(--line); }
+
+/* Ranking de PRs (panel de clubs) */
+.chipnav { display: flex; gap: 8px; overflow-x: auto; padding: 2px 0 6px; }
+.chipnav a { flex-shrink: 0; font-size: 13px; font-weight: 600; padding: 7px 12px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chipnav a.on { background: var(--cream); color: var(--wine-900); border-color: var(--cream); }
+.rank { list-style: none; margin: 0; padding: 0; }
+.rank > li { border-bottom: 1px solid var(--line); padding: 14px 0; }
+.rank-main { display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; gap: 12px; align-items: center; }
+.rank-pos { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; border: 1px solid var(--line); color: var(--muted); }
+.rank > li:nth-child(1) .rank-pos { background: linear-gradient(135deg, #9b7430, #edd08e); color: #2a1208; border: 0; }
+.rank > li:nth-child(2) .rank-pos { background: linear-gradient(135deg, #8e9196, #e4e5e7); color: #1d1f22; border: 0; }
+.rank > li:nth-child(3) .rank-pos { background: linear-gradient(135deg, #7a4a2e, #c48a5e); color: #2a1208; border: 0; }
+.rank-who b { font-size: 16px; letter-spacing: 0.04em; }
+.rank-who span { display: block; font-size: 13px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rank-num { text-align: right; }
+.rank-num b { display: block; font-family: var(--display); font-weight: 500; font-size: 28px; line-height: 1; }
+.rank-num span { font-size: 12px; color: var(--muted); }
+.rank-bar { height: 4px; border-radius: 2px; background: var(--line); margin: 10px 0 0 46px; overflow: hidden; }
+.rank-bar i { display: block; height: 100%; background: var(--gold); border-radius: 2px; }
+.rank > li:nth-child(n+4) .rank-bar i { background: var(--cream-2); opacity: 0.5; }
+.rank-meta { display: flex; flex-wrap: wrap; gap: 4px 16px; margin: 8px 0 0 46px; font-size: 13px; color: var(--cream-2); }
+.rank-meta em { font-style: normal; color: var(--muted); }
+.rank-tools { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 10px 0 0 46px; }
+.rank-tools form { display: flex; gap: 6px; align-items: center; }
+.rank-tools input[type="number"] { width: 70px; background: var(--wine-700); border: 1px solid var(--line); border-radius: var(--r-md); padding: 7px 10px; font-size: 14px; color: var(--cream); }
+.rank-tools .pill { background: transparent; color: var(--cream); cursor: pointer; }
+.rank-tools .pill.gold { background: var(--gold); color: var(--wine-950); }
+.rank .warn { color: var(--gold-2); font-size: 12px; }
+.addpr { display: grid; grid-template-columns: minmax(0, 1fr) 100px; gap: 10px; }

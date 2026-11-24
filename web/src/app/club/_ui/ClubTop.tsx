@@ -4,8 +4,9 @@ import LangSwitch from "@/components/LangSwitch";
 import { getT } from "@/lib/lang";
 
 /** Cabecera de la nit for clubs (web aparte de la de compradores). */
-export default async function ClubTop({ active, admin = false, loggedIn = true }: { active?: "panel" | "scan" | "admin"; admin?: boolean; loggedIn?: boolean }) {
-  const c = (await getT()).t.club;
+export default async function ClubTop({ active, admin = false, loggedIn = true }: { active?: "panel" | "scan" | "prs" | "admin"; admin?: boolean; loggedIn?: boolean }) {
+  const { t } = await getT();
+  const c = t.club;
   return (
     <>
       <header className="panel-top">
@@ -22,6 +23,7 @@ export default async function ClubTop({ active, admin = false, loggedIn = true }
       {loggedIn && (
         <nav className="tabs" aria-label={c.panel}>
           <Link href="/club" className={active === "panel" ? "on" : ""}>{c.tabEvents}</Link>
+          <Link href="/club/prs" className={active === "prs" ? "on" : ""}>{t.pr.club.tab}</Link>
           <Link href="/club/scan" className={active === "scan" ? "on" : ""}>{c.tabScan}</Link>
           {admin && <Link href="/club/admin" className={active === "admin" ? "on" : ""}>{c.tabAdmin}</Link>}
         </nav>

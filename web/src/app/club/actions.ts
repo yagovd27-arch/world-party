@@ -2,7 +2,8 @@
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { getUser, isAdmin } from "@/lib/auth";
+import { getUser, isAdmin, requireClub } from "@/lib/auth";
+import { getPromoterByCode, normalizeCode, rankingForClub } from "@/lib/promoters";
 import { tzFor, zonedToUtc } from "@/lib/format";
 import { supabaseAdmin, supabaseServer } from "@/lib/supabase/server";
 import { getT } from "@/lib/lang";
@@ -222,4 +223,72 @@ export async function rejectUpi(form: FormData) {
   await supabaseAdmin().from("orders").update({ status: "failed" }).eq("id", o.id).eq("status", "pending");
   revalidatePath(`/club/eventos/${o.event_id}`);
   redirect(`/club/eventos/${o.event_id}`);
+}
+
+/* ---------- PRs ---------- */
+
+const prBack = (q: string, ev?: string) => redirect(`/club/prs?${q}${ev && UUID.test(ev) ? `&ev=${ev}` : ""}`);
+
+/** Solo dueños, managers y admins tocan comisiones (el de la puerta no). */
+async function prClub() {
+  const { club } = await requireClub();
+  if (club.role === "door") redirect("/club");
+  return club;
+}
+
+/** Añade un PR al club por su código, con su % de comisión. */
+export async function addClubPromoter(form: FormData) {
+  const k = (await getT()).t.pr.club;
+  const club = await prClub();
+  const code = normalizeCode(str(form, "code", 20));
+  const pct = Number(str(form, "pct", 6).replace(",", "."));
+  if (!Number.isFinite(pct) || pct < 0 || pct > 50) prBack("e=" + encodeURIComponent(k.ePct));
+  const p = await getPromoterByCode(code);
+  if (!p) prBack("e=" + encodeURIComponent(k.eNoCode));
+  const { error } = await supabaseAdmin().from("club_promoters")
+    .upsert({ club_id: club.id, promoter_id: p!.id, commission_pct: pct }, { onConflict: "club_id,promoter_id" });
+  if (error) { console.error("[addClubPromoter]", error.message); prBack("e=" + encodeURIComponent(k.eSave)); }
+  revalidatePath("/club/prs");
+  prBack("n=" + encodeURIComponent(k.nAdded(p!.code)));
+}
+
+/** Cambia el % de comisión de un PR. */
+export async function setClubPromoterPct(form: FormData) {
+  const k = (await getT()).t.pr.club;
+  const club = await prClub();
+  const id = str(form, "id", 40), ev = str(form, "ev", 40);
+  const pct = Number(str(form, "pct", 6).replace(",", "."));
+  if (!UUID.test(id)) prBack("e=" + encodeURIComponent(k.eSave), ev);
+  if (!Number.isFinite(pct) || pct < 0 || pct > 50) prBack("e=" + encodeURIComponent(k.ePct), ev);
+  const { error } = await supabaseAdmin().from("club_promoters")
+    .upsert({ club_id: club.id, promoter_id: id, commission_pct: pct }, { onConflict: "club_id,promoter_id" });
+  if (error) { console.error("[setClubPromoterPct]", error.message); prBack("e=" + encodeURIComponent(k.eSave), ev); }
+  revalidatePath("/club/prs");
+  prBack("n=" + encodeURIComponent(k.nSaved), ev);
+}
+
+/** Apunta que el club ya le pagó al PR todo lo que llevaba ganado. */
+export async function markClubPromoterPaid(form: FormData) {
+  const k = (await getT()).t.pr.club;
+  const club = await prClub();
+  const id = str(form, "id", 40), ev = str(form, "ev", 40);
+  if (!UUID.test(id)) prBack("e=" + encodeURIComponent(k.eSave), ev);
+  const { list } = await rankingForClub(club.id);
+  const row = list.find((r) => r.id === id && r.added);
+  if (!row) prBack("e=" + encodeURIComponent(k.eSave), ev);
+  const { error } = await supabaseAdmin().from("club_promoters").update({ paid: row!.earned }).eq("club_id", club.id).eq("promoter_id", id);
+  if (error) { console.error("[markClubPromoterPaid]", error.message); prBack("e=" + encodeURIComponent(k.eSave), ev); }
+  revalidatePath("/club/prs");
+  prBack("n=" + encodeURIComponent(k.nPaid), ev);
+}
+
+/** Quita a un PR del club (sus ventas pasadas siguen contando en el ranking). */
+export async function removeClubPromoter(form: FormData) {
+  const k = (await getT()).t.pr.club;
+  const club = await prClub();
+  const id = str(form, "id", 40), ev = str(form, "ev", 40);
+  if (!UUID.test(id)) prBack("e=" + encodeURIComponent(k.eSave), ev);
+  await supabaseAdmin().from("club_promoters").delete().eq("club_id", club.id).eq("promoter_id", id);
+  revalidatePath("/club/prs");
+  prBack("n=" + encodeURIComponent(k.nRemoved), ev);
 }

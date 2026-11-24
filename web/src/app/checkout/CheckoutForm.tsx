@@ -22,12 +22,13 @@ function loadRazorpay(): Promise<boolean> {
   });
 }
 
-export default function CheckoutForm({ eventId, items, totalLabel, defaultEmail, note }: { eventId: string; items: { id: string; qty: number }[]; totalLabel: string; defaultEmail: string; note?: string }) {
+export default function CheckoutForm({ eventId, items, totalLabel, defaultEmail, defaultPromo = "", note }: { eventId: string; items: { id: string; qty: number }[]; totalLabel: string; defaultEmail: string; defaultPromo?: string; note?: string }) {
   const router = useRouter();
   const t = useT();
   const [name, setName] = useState("");
   const [email, setEmail] = useState(defaultEmail);
   const [phone, setPhone] = useState("");
+  const [promo, setPromo] = useState(defaultPromo);
   const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);
 
@@ -42,7 +43,7 @@ export default function CheckoutForm({ eventId, items, totalLabel, defaultEmail,
       const res = await fetch("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ eventId, items, buyer: { name: name.trim(), email: email.trim(), phone: phone.trim() } }),
+        body: JSON.stringify({ eventId, items, buyer: { name: name.trim(), email: email.trim(), phone: phone.trim() }, promoCode: promo.trim() || undefined }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? t.errOrder);
@@ -102,6 +103,7 @@ export default function CheckoutForm({ eventId, items, totalLabel, defaultEmail,
       <div className="field"><label htmlFor="n">{t.fullName}</label><input id="n" autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} /></div>
       <div className="field"><label htmlFor="em">{t.email}</label><input id="em" type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} /></div>
       <div className="field"><label htmlFor="ph">{t.phoneWa}</label><input id="ph" type="tel" autoComplete="tel" value={phone} onChange={(e) => setPhone(e.target.value)} /></div>
+      <div className="field"><label htmlFor="pr">{t.pr.checkoutLabel}</label><input id="pr" autoComplete="off" autoCapitalize="characters" maxLength={16} placeholder={t.pr.checkoutPh} value={promo} onChange={(e) => setPromo(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ""))} style={{ letterSpacing: 1, fontWeight: 600 }} /></div>
       <button className="cta block gold" disabled={busy}>{busy ? t.processing : t.payX(totalLabel)}</button>
       {err && <p className="error" role="alert">{err}</p>}
       <p className="fine" style={{ marginTop: 12, textAlign: "center" }}>{note ?? t.payNote}</p>

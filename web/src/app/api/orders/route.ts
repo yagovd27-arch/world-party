@@ -6,11 +6,13 @@ import { isSupabaseOn, supabaseAdmin } from "@/lib/supabase/server";
 import { SERVICE_FEE_RATE, type EventItem } from "@/lib/types";
 import { getT } from "@/lib/lang";
 import { confirmOrder } from "@/lib/confirm";
+import { getPromoterByCode, normalizeCode } from "@/lib/promoters";
 
 type Body = {
   eventId?: string;
   items?: { id: string; qty: number }[];
   buyer?: { name?: string; email?: string; phone?: string };
+  promoCode?: string;
 };
 
 const bad = (error: string, status = 400) => NextResponse.json({ error }, { status });
@@ -68,6 +70,15 @@ export async function POST(req: Request) {
   const total = subtotal + fee;
   const currency = event.city.currency;
 
+  // Código de PR: si lo escribió y no existe, se avisa; comprarse a uno mismo no cuenta.
+  let promoter_id: string | null = null;
+  const promo = normalizeCode(String(body.promoCode ?? ""));
+  if (promo) {
+    const p = await getPromoterByCode(promo);
+    if (!p) return bad(t.pr.eCheckout);
+    if (p.email.toLowerCase() !== buyer.email.trim().toLowerCase()) promoter_id = p.id;
+  }
+
   const useUpi = !razorpayOn && upiOn && currency === "INR";
   if (!razorpayOn && !useUpi && !demoPayments) return bad(m.paymentsOff, 503);
 
@@ -76,6 +87,7 @@ export async function POST(req: Request) {
     .insert({
       event_id: event.id, buyer_name: buyer.name, buyer_email: buyer.email, buyer_phone: buyer.phone ?? null,
       subtotal, service_fee: fee, total, currency, payment_provider: razorpayOn ? "razorpay" : useUpi ? "upi" : "demo",
+      ...(promoter_id ? { promoter_id } : {}),
     })
     .select("id, access_key")
     .single();

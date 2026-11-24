@@ -19,6 +19,7 @@ function LegalLinks() {
   );
 }
 import { supabaseAdmin } from "@/lib/supabase/server";
+import { getMyPromoter } from "@/lib/promoters";
 
 export async function generateMetadata() {
   const { t } = await getT();
@@ -114,7 +115,10 @@ export default async function Perfil() {
           </p>
           <LoginForm next="/perfil" />
         </section>
-        <section className="section" style={{ paddingTop: 30 }}><ForClubs t={t} /></section>
+        <section className="section" style={{ paddingTop: 30 }}>
+          <ForClubs t={t} />
+          <nav className="settings" style={{ marginTop: 14 }}><Link href="/pr"><span>{t.pr.profileLinkNew}</span><span className="muted trunc">{t.pr.profileLinkSub}</span></Link></nav>
+        </section>
         <LegalLinks />
         <BottomNav />
       </main>
@@ -122,7 +126,7 @@ export default async function Perfil() {
   }
 
   const email = user.email ?? "";
-  const [h, cities] = await Promise.all([email ? history(email) : Promise.resolve({ tickets: 0, points: 0, events: 0, cities: 0 }), getCities()]);
+  const [h, cities, pr] = await Promise.all([email ? history(email) : Promise.resolve({ tickets: 0, points: 0, events: 0, cities: 0 }), getCities(), getMyPromoter(user.id)]);
   const { city } = await currentCity(cities);
   const points = h.points;
   const { cur, next, pct } = level(points);
@@ -174,6 +178,7 @@ export default async function Perfil() {
           <Link href="/entradas"><span>{t.nav.myTickets}</span><span className="muted">{h.tickets}</span></Link>
           <Link href="/ciudades"><span>{p.city}</span><span className="muted">{city ? cityName(city, lang) : p.choose}</span></Link>
           <div><span>{t.email}</span><span className="muted trunc">{email}</span></div>
+          <Link href="/pr"><span>{pr ? t.pr.profileLink : t.pr.profileLinkNew}</span><span className="muted trunc">{pr ? pr.code : t.pr.profileLinkSub}</span></Link>
         </nav>
         <div style={{ marginTop: 18 }}><ForClubs t={t} /></div>
         <div style={{ marginTop: 12 }}><SignOut to="/perfil" /></div>

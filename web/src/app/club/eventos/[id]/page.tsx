@@ -8,6 +8,7 @@ import { confirmUpi, rejectUpi, setEventStatus } from "../../actions";
 import { orderRef } from "@/lib/payments";
 import ClubTop from "../../_ui/ClubTop";
 import { getT } from "@/lib/lang";
+import { rankingForClub } from "@/lib/promoters";
 
 export const metadata = { title: "la nit for clubs" };
 
@@ -25,7 +26,7 @@ type Order = {
 export default async function ClubEvent({ params, searchParams }: PageProps<"/club/eventos/[id]">) {
   const { id } = await params;
   const sp = await searchParams;
-  const { admin } = await requireClub();
+  const { admin, club } = await requireClub();
   const { lang, t } = await getT();
   const c = t.club;
   if (!/^[0-9a-f-]{36}$/i.test(id)) notFound();
@@ -55,6 +56,7 @@ export default async function ClubEvent({ params, searchParams }: PageProps<"/cl
   const revenue = tiers.reduce((s, t) => s + t.sold * t.price, 0);
   const tickets = orders.flatMap((o) => o.tickets);
   const inside = tickets.filter((t) => t.scanned_at).length;
+  const prs = (await rankingForClub(club.id, e.id)).list.filter((r) => r.tickets > 0);
   const note = typeof sp.n === "string" ? sp.n : "";
   const err = typeof sp.e === "string" ? sp.e : "";
 
@@ -131,6 +133,23 @@ export default async function ClubEvent({ params, searchParams }: PageProps<"/cl
           </tbody>
         </table>
       </div>
+
+      {prs.length > 0 && (
+        <>
+          <h2 className="ghead">{t.pr.club.eventPrs}</h2>
+          <div className="section" style={{ paddingTop: 10 }}>
+            <table className="t">
+              <thead><tr><th>#</th><th>{t.pr.club.cPr}</th><th>{t.pr.club.cTickets}</th><th>{t.pr.club.cRevenue}</th><th>{t.pr.club.cPct}</th></tr></thead>
+              <tbody>
+                {prs.slice(0, 5).map((r, i) => (
+                  <tr key={r.id}><td>{i + 1}</td><td><b>{r.code}</b><span className="fine" style={{ display: "block" }}>{r.name}</span></td><td>{r.tickets}</td><td>{money(r.revenue, sym)}</td><td>{r.added ? money(r.commission, sym) : "—"}</td></tr>
+                ))}
+              </tbody>
+            </table>
+            <Link href={`/club/prs?ev=${e.id}`} className="fine" style={{ display: "inline-block", marginTop: 10, textDecoration: "underline" }}>{t.pr.club.seeRanking}</Link>
+          </div>
+        </>
+      )}
 
       <h2 className="ghead">{c.buyers(orders.length)}</h2>
       <div className="section" style={{ paddingTop: 10, overflowX: "auto" }}>
