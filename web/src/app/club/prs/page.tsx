@@ -46,7 +46,7 @@ export default async function ClubPrs({ searchParams }: PageProps<"/club/prs">) 
       </section>
 
       {events.length > 0 && (
-        <div className="section" style={{ paddingTop: 0 }}>
+        <div className="section" style={{ paddingTop: 18 }}>
           <nav className="chipnav" aria-label={k.title}>
             <Link href="/club/prs" className={!ev ? "on" : ""}>{k.all}</Link>
             {events.slice(0, 12).map((e) => (
