@@ -6,7 +6,7 @@ import { supabaseAdmin } from "@/lib/supabase/server";
 
 /**
  * Respaldo de Stripe: emite las entradas aunque el comprador cierre el navegador.
- * En Stripe → Developers → Webhooks: https://lanit.club/api/stripe/webhook con los eventos
+ * En Stripe → Developers → Webhooks: https://www.lanit.club/api/stripe/webhook (con www: lanit.club redirige y Stripe no sigue redirecciones) con los eventos
  * checkout.session.completed, checkout.session.async_payment_succeeded y checkout.session.expired.
  */
 export async function POST(req: Request) {
