@@ -22,7 +22,9 @@ function loadRazorpay(): Promise<boolean> {
   });
 }
 
-export default function CheckoutForm({ eventId, items, totalLabel, defaultEmail, defaultPromo = "", note }: { eventId: string; items: { id: string; qty: number }[]; totalLabel: string; defaultEmail: string; defaultPromo?: string; note?: string }) {
+type Method = "razorpay" | "card" | "upi";
+
+export default function CheckoutForm({ eventId, items, totalLabel, defaultEmail, defaultPromo = "", note, methods = [] }: { eventId: string; items: { id: string; qty: number }[]; totalLabel: string; defaultEmail: string; defaultPromo?: string; note?: string; methods?: Method[] }) {
   const router = useRouter();
   const t = useT();
   const [name, setName] = useState("");
@@ -38,12 +40,13 @@ export default function CheckoutForm({ eventId, items, totalLabel, defaultEmail,
     if (name.trim().length < 2) return setErr(t.errName);
     if (!/^\S+@\S+\.\S+$/.test(email)) return setErr(t.errEmailTicket);
     if (phone.replace(/\D/g, "").length < 8) return setErr(t.errPhone);
+    const method = ((ev.nativeEvent as SubmitEvent).submitter as HTMLButtonElement | null)?.dataset.m as Method | undefined;
     setBusy(true);
     try {
       const res = await fetch("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ eventId, items, buyer: { name: name.trim(), email: email.trim(), phone: phone.trim() }, promoCode: promo.trim() || undefined }),
+        body: JSON.stringify({ eventId, items, buyer: { name: name.trim(), email: email.trim(), phone: phone.trim() }, promoCode: promo.trim() || undefined, method }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? t.errOrder);
@@ -56,6 +59,11 @@ export default function CheckoutForm({ eventId, items, totalLabel, defaultEmail,
       if (data.mode === "paid") {
         saveOrderRef({ id: data.orderId, key: data.accessKey });
         router.push(`/t/${data.orderId}?k=${data.accessKey}&nuevo=1`);
+        return;
+      }
+      if (data.mode === "redirect") {
+        saveOrderRef({ id: data.orderId, key: data.accessKey });
+        window.location.href = data.url;
         return;
       }
       if (data.mode === "upi") {
@@ -104,7 +112,22 @@ export default function CheckoutForm({ eventId, items, totalLabel, defaultEmail,
       <div className="field"><label htmlFor="em">{t.email}</label><input id="em" type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} /></div>
       <div className="field"><label htmlFor="ph">{t.phoneWa}</label><input id="ph" type="tel" autoComplete="tel" value={phone} onChange={(e) => setPhone(e.target.value)} /></div>
       <div className="field"><label htmlFor="pr">{t.pr.checkoutLabel}</label><input id="pr" autoComplete="off" autoCapitalize="characters" maxLength={16} placeholder={t.pr.checkoutPh} value={promo} onChange={(e) => setPromo(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ""))} style={{ letterSpacing: 1, fontWeight: 600 }} /></div>
-      <button className="cta block gold" disabled={busy}>{busy ? t.processing : t.payX(totalLabel)}</button>
+      {methods.includes("card") ? (
+        <>
+          <button className="cta block gold paybtn" data-m="card" disabled={busy}>
+            {busy ? t.processing : t.payCard(totalLabel)}
+            {!busy && <small>{t.cardSub}</small>}
+          </button>
+          {methods.includes("upi") && (
+            <>
+              <p className="fine" style={{ margin: "14px 0 8px", textAlign: "center" }}>{t.upiAlt}</p>
+              <button className="cta block ghost" data-m="upi" disabled={busy}>{t.payUpi}</button>
+            </>
+          )}
+        </>
+      ) : (
+        <button className="cta block gold" data-m={methods[0]} disabled={busy}>{busy ? t.processing : t.payX(totalLabel)}</button>
+      )}
       {err && <p className="error" role="alert">{err}</p>}
       <p className="fine" style={{ marginTop: 12, textAlign: "center" }}>{note ?? t.payNote}</p>
     </form>

@@ -1,5 +1,6 @@
 import "server-only";
 import { createHmac, timingSafeEqual } from "node:crypto";
+import { stripeOn } from "./stripe";
 
 const KEY_ID = process.env.RAZORPAY_KEY_ID;
 const KEY_SECRET = process.env.RAZORPAY_KEY_SECRET;
@@ -56,10 +57,20 @@ export function upiUri(amount: number, note: string) {
 }
 
 /** Código corto del pedido para el concepto del pago y para buscarlo en el panel. */
-/** ¿Se puede vender online en esta moneda ahora mismo? Razorpay y UPI solo cobran en rupias. */
+/** ¿Se puede vender online en esta moneda ahora mismo? Razorpay y UPI solo cobran en rupias; Stripe en cualquiera. */
 export function canSell(currency: string) {
-  if (demoPayments) return true;
+  if (demoPayments || stripeOn) return true;
   return currency === "INR" && (razorpayOn || Boolean(UPI_VPA));
+}
+
+export type PayMethod = "razorpay" | "card" | "upi";
+/** Formas de pago que se ofrecen en el checkout, en orden (la primera es el botón principal). */
+export function payMethods(currency: string): PayMethod[] {
+  if (razorpayOn && currency === "INR") return ["razorpay"];
+  const m: PayMethod[] = [];
+  if (stripeOn) m.push("card");
+  if (upiOn && currency === "INR") m.push("upi");
+  return m;
 }
 
 export const orderRef = (id: string) => "LN" + id.replace(/-/g, "").slice(0, 6).toUpperCase();

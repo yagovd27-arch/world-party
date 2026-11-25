@@ -338,3 +338,4 @@ table.t th { font-size: 12px; color: var(--muted); font-weight: 600; }
 .rank-tools .pill.gold { background: var(--gold); color: var(--wine-950); }
 .rank .warn { color: var(--gold-2); font-size: 12px; }
 .addpr { display: grid; grid-template-columns: minmax(0, 1fr) 100px; gap: 10px; }
+.paybtn small { display: block; font-size: 12px; font-weight: 600; opacity: 0.7; margin-top: 2px; }

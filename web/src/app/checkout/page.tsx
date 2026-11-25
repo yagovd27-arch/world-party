@@ -6,7 +6,7 @@ import { getCity, getEvent } from "@/lib/data";
 import { dayLabel, money, parts, serviceFee, tzFor } from "@/lib/format";
 import { SERVICE_FEE_RATE } from "@/lib/types";
 import { getT } from "@/lib/lang";
-import { canSell, razorpayOn, upiOn } from "@/lib/payments";
+import { canSell, payMethods } from "@/lib/payments";
 import { legalReady } from "@/lib/legal";
 import { cookies } from "next/headers";
 
@@ -51,7 +51,7 @@ export default async function Checkout({ searchParams }: PageProps<"/checkout">)
           <div className="sum"><span>{t.serviceFee}</span><span>{money(fee, city.currency_symbol)}</span></div>
           <div className="sum total"><span>{t.total}</span><span>{money(subtotal + fee, city.currency_symbol)}</span></div>
         </div>
-        {!canSell(city.currency) ? <p className="notice">{t.salesSoon}</p> : <CheckoutForm eventId={e.id} items={lines.map(({ t, qty }) => ({ id: t.id, qty }))} totalLabel={money(subtotal + fee, city.currency_symbol)} defaultEmail={user?.email ?? ""} defaultPromo={/^[A-Z0-9]{3,16}$/.test(pr) ? pr : ""} note={!razorpayOn && upiOn && city.currency === "INR" ? t.upi.checkoutNote : undefined} />}
+        {!canSell(city.currency) ? <p className="notice">{t.salesSoon}</p> : <CheckoutForm eventId={e.id} items={lines.map(({ t, qty }) => ({ id: t.id, qty }))} totalLabel={money(subtotal + fee, city.currency_symbol)} defaultEmail={user?.email ?? ""} defaultPromo={/^[A-Z0-9]{3,16}$/.test(pr) ? pr : ""} methods={payMethods(city.currency)} note={payMethods(city.currency).includes("card") ? t.cardNote : payMethods(city.currency)[0] === "upi" ? t.upi.checkoutNote : undefined} />}
         {legalReady && (
           <p className="fine" style={{ marginTop: 10, textAlign: "center" }}>
             {t.acceptTerms} <Link href="/terms" style={{ textDecoration: "underline" }}>{t.termsLink}</Link> · <Link href="/refunds" style={{ textDecoration: "underline" }}>{t.refundsLink}</Link>
