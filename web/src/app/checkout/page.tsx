@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import CheckoutForm from "./CheckoutForm";
-import { getUser } from "@/lib/auth";
+import { getUser, isAdmin } from "@/lib/auth";
 import { getCity, getEvent } from "@/lib/data";
 import { dayLabel, money, parts, serviceFee, tzFor } from "@/lib/format";
 import { SERVICE_FEE_RATE } from "@/lib/types";
@@ -30,6 +30,7 @@ export default async function Checkout({ searchParams }: PageProps<"/checkout">)
   const tz = tzFor(e.city_id);
   const user = await getUser();
   const { lang, t } = await getT();
+  const admin = await isAdmin();
   const pr = (await cookies()).get("pr")?.value ?? "";
 
   return (
@@ -51,7 +52,7 @@ export default async function Checkout({ searchParams }: PageProps<"/checkout">)
           <div className="sum"><span>{t.serviceFee}</span><span>{money(fee, city.currency_symbol)}</span></div>
           <div className="sum total"><span>{t.total}</span><span>{money(subtotal + fee, city.currency_symbol)}</span></div>
         </div>
-        {!canSell(city.currency) ? <p className="notice">{t.salesSoon}</p> : <CheckoutForm eventId={e.id} items={lines.map(({ t, qty }) => ({ id: t.id, qty }))} totalLabel={money(subtotal + fee, city.currency_symbol)} defaultEmail={user?.email ?? ""} defaultPromo={/^[A-Z0-9]{3,16}$/.test(pr) ? pr : ""} methods={payMethods(city.currency)} note={payMethods(city.currency).includes("card") ? t.cardNote : payMethods(city.currency)[0] === "upi" ? t.upi.checkoutNote : undefined} />}
+        {!canSell(city.currency, admin) ? <p className="notice">{t.salesSoon}</p> : <CheckoutForm eventId={e.id} items={lines.map(({ t, qty }) => ({ id: t.id, qty }))} totalLabel={money(subtotal + fee, city.currency_symbol)} defaultEmail={user?.email ?? ""} defaultPromo={/^[A-Z0-9]{3,16}$/.test(pr) ? pr : ""} methods={payMethods(city.currency, admin)} note={payMethods(city.currency, admin).includes("card") ? t.cardNote : payMethods(city.currency, admin)[0] === "upi" ? t.upi.checkoutNote : undefined} />}
         {legalReady && (
           <p className="fine" style={{ marginTop: 10, textAlign: "center" }}>
             {t.acceptTerms} <Link href="/terms" style={{ textDecoration: "underline" }}>{t.termsLink}</Link> · <Link href="/refunds" style={{ textDecoration: "underline" }}>{t.refundsLink}</Link>

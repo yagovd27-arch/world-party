@@ -7,6 +7,8 @@ import { createHmac, timingSafeEqual } from "node:crypto";
  */
 const SECRET = process.env.STRIPE_SECRET_KEY?.trim() || "";
 export const stripeOn = Boolean(SECRET);
+/** Con claves de prueba solo los admins ven el pago con tarjeta (si no, cualquiera sacaría entradas gratis con la tarjeta de prueba). */
+export const stripeTest = SECRET.startsWith("sk_test_");
 
 async function api<T>(method: "GET" | "POST", path: string, params?: Record<string, string | number | undefined>): Promise<T> {
   const body = params

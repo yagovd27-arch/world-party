@@ -7,6 +7,7 @@ import { isSupabaseOn, supabaseAdmin } from "@/lib/supabase/server";
 import { SERVICE_FEE_RATE, type EventItem } from "@/lib/types";
 import { getT } from "@/lib/lang";
 import { confirmOrder } from "@/lib/confirm";
+import { isAdmin } from "@/lib/auth";
 import { getPromoterByCode, normalizeCode } from "@/lib/promoters";
 
 type Body = {
@@ -81,7 +82,7 @@ export async function POST(req: Request) {
     if (p.email.toLowerCase() !== buyer.email.trim().toLowerCase()) promoter_id = p.id;
   }
 
-  const methods = payMethods(currency);
+  const methods = payMethods(currency, await isAdmin());
   const method: PayMethod | null = body.method && methods.includes(body.method) ? body.method : methods[0] ?? null;
   if (!method && !demoPayments) return bad(m.paymentsOff, 503);
   const provider = method === "razorpay" ? "razorpay" : method === "card" ? "stripe" : method === "upi" ? "upi" : "demo";
