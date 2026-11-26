@@ -64,8 +64,14 @@ export function money(n: number, symbol: string) {
   return symbol + Math.round(n).toLocaleString(symbol === "₹" ? "en-IN" : "en-US");
 }
 
+/**
+ * Cargo por servicio: el % redondeado hacia abajo para que el total acabe en 9
+ * (₹1,299 + 8% = 1,403 → total 1,399). Nunca baja de 0.
+ */
 export function serviceFee(subtotal: number, rate: number) {
-  return Math.round(subtotal * rate);
+  const total = subtotal + Math.round(subtotal * rate);
+  const nice = Math.floor((total + 1) / 10) * 10 - 1;
+  return Math.max(0, nice - subtotal);
 }
 
 /** "2026-12-13T22:00" en la hora de la ciudad → ISO en UTC. */
