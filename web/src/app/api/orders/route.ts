@@ -4,7 +4,7 @@ import { parts, serviceFee, shortDate, tzFor } from "@/lib/format";
 import { createRazorpayOrder, demoPayments, payMethods, razorpayKeyId, type PayMethod } from "@/lib/payments";
 import { createCheckoutSession } from "@/lib/stripe";
 import { isSupabaseOn, supabaseAdmin } from "@/lib/supabase/server";
-import { SERVICE_FEE_RATE, type EventItem } from "@/lib/types";
+import { feeRateFor, type EventItem } from "@/lib/types";
 import { getT } from "@/lib/lang";
 import { confirmOrder } from "@/lib/confirm";
 import { isAdmin } from "@/lib/auth";
@@ -53,11 +53,11 @@ export async function POST(req: Request) {
   const sb = supabaseAdmin();
   const { data: ev, error: evErr } = await sb
     .from("events")
-    .select("id, title, status, starts_at, city_id, ticket_types(*), city:cities(currency)")
+    .select("id, title, status, starts_at, city_id, ticket_types(*), city:cities(currency), club:clubs(fee_rate)")
     .eq("id", eventId)
     .maybeSingle();
   if (evErr || !ev || ev.status !== "published") return bad(m.notOnSale, 404);
-  const event = ev as unknown as EventItem & { city: { currency: string } };
+  const event = ev as unknown as EventItem & { city: { currency: string }; club: { fee_rate: number | null } };
   if (new Date(event.starts_at).getTime() < Date.now() - 4 * 3600e3) return bad(m.past);
 
   const lines = [];
@@ -69,7 +69,7 @@ export async function POST(req: Request) {
     lines.push({ t, qty: i.qty });
   }
   const subtotal = lines.reduce((s, l) => s + l.qty * l.t.price, 0);
-  const fee = serviceFee(subtotal, SERVICE_FEE_RATE);
+  const fee = serviceFee(subtotal, feeRateFor(event.club));
   const total = subtotal + fee;
   const currency = event.city.currency;
 

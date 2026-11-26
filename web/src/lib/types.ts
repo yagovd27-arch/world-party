@@ -34,7 +34,7 @@ export type EventItem = {
   min_age: number;
   dress_code: string | null;
   status: "draft" | "published" | "cancelled";
-  club: { name: string; area: string | null; address?: string | null; instagram?: string | null; verified: boolean };
+  club: { name: string; area: string | null; address?: string | null; instagram?: string | null; verified: boolean; fee_rate?: number | null };
   ticket_types: TicketType[];
 };
 
@@ -46,3 +46,6 @@ export const TYPE_LABEL: Record<EventType, string> = {
 
 /** Cargo de servicio que paga el comprador, encima del precio. */
 export const SERVICE_FEE_RATE = 0.08;
+/** % de cargo de un club: el suyo si lo tiene (p. ej. 0 en eventos propios), si no el general. */
+export const feeRateFor = (club?: { fee_rate?: number | string | null } | null) =>
+  club?.fee_rate != null ? Number(club.fee_rate) : SERVICE_FEE_RATE;

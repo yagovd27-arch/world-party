@@ -4,7 +4,7 @@ import { isSupabaseOn, supabaseServer } from "./supabase/server";
 import type { City, EventItem } from "./types";
 
 const EVENT_SELECT =
-  "id, club_id, city_id, title, description, lineup, type, starts_at, image_url, min_age, dress_code, status, club:clubs(name, area, address, instagram, verified), ticket_types(*)";
+  "id, club_id, city_id, title, description, lineup, type, starts_at, image_url, min_age, dress_code, status, club:clubs(name, area, address, instagram, verified, fee_rate), ticket_types(*)";
 
 function sortTiers(e: EventItem): EventItem {
   return { ...e, ticket_types: [...(e.ticket_types ?? [])].sort((a, b) => a.sort - b.sort) };
