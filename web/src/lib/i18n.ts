@@ -900,8 +900,8 @@ export const DICTS: Record<Lang, Dict> = { es, en };
 export const dict = (lang: Lang): Dict => DICTS[lang];
 
 /** Nombres de ciudad y país en cada idioma (en la base de datos están en español). */
-const CITY_EN: Record<string, string> = { delhi: "Delhi", cdmx: "Mexico City" };
-const COUNTRY_EN: Record<string, string> = { "México": "Mexico" };
+const CITY_EN: Record<string, string> = { delhi: "Delhi", cdmx: "Mexico City", london: "London", bogota: "Bogotá", medellin: "Medellín" };
+const COUNTRY_EN: Record<string, string> = { "México": "Mexico", "España": "Spain", "Reino Unido": "United Kingdom", "Colombia": "Colombia" };
 export function cityName(c: { id: string; name: string }, lang: Lang) {
   return lang === "en" ? CITY_EN[c.id] ?? c.name : c.name;
 }

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import QRCode from "qrcode";
 import { dayLabel, money, parts, tzFor } from "@/lib/format";
@@ -63,7 +64,11 @@ export default async function PayUpi({ params, searchParams }: PageProps<"/pagar
 
   return (
     <main className="shell">
-      <header className="top"><span className="logo" style={{ fontSize: 20 }}>{u.title}</span></header>
+      <header className="top">
+        <Link className="icon-btn homebtn" href="/" aria-label="la nit">la nit<b>.</b></Link>
+        <span className="logo" style={{ fontSize: 20 }}>{u.title}</span>
+        <span style={{ width: 42 }} />
+      </header>
       <section className="section">
         {head}
         <div className="upi">

@@ -9,6 +9,21 @@ export const CITY_TZ: Record<string, string> = {
   monterrey: "America/Monterrey",
   guadalajara: "America/Mexico_City",
   shanghai: "Asia/Shanghai",
+  mumbai: "Asia/Kolkata",
+  bangalore: "Asia/Kolkata",
+  goa: "Asia/Kolkata",
+  kolkata: "Asia/Kolkata",
+  pune: "Asia/Kolkata",
+  hyderabad: "Asia/Kolkata",
+  chandigarh: "Asia/Kolkata",
+  chennai: "Asia/Kolkata",
+  jaipur: "Asia/Kolkata",
+  london: "Europe/London",
+  barcelona: "Europe/Madrid",
+  "buenos-aires": "America/Argentina/Buenos_Aires",
+  sydney: "Australia/Sydney",
+  bogota: "America/Bogota",
+  medellin: "America/Bogota",
 };
 
 export function tzFor(cityId: string) {

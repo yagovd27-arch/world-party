@@ -11,6 +11,21 @@ const COORDS: Record<string, [number, number]> = {
   monterrey: [25.6866, -100.3161],
   guadalajara: [20.6597, -103.3496],
   shanghai: [31.2304, 121.4737],
+  mumbai: [19.076, 72.8777],
+  bangalore: [12.9716, 77.5946],
+  goa: [15.4909, 73.8278],
+  kolkata: [22.5726, 88.3639],
+  pune: [18.5204, 73.8567],
+  hyderabad: [17.385, 78.4867],
+  chandigarh: [30.7333, 76.7794],
+  chennai: [13.0827, 80.2707],
+  jaipur: [26.9124, 75.7873],
+  london: [51.5074, -0.1278],
+  barcelona: [41.3874, 2.1686],
+  "buenos-aires": [-34.6037, -58.3816],
+  sydney: [-33.8688, 151.2093],
+  bogota: [4.711, -74.0721],
+  medellin: [6.2442, -75.5812],
 };
 
 function km([a1, o1]: [number, number], [a2, o2]: [number, number]) {

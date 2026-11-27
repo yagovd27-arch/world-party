@@ -48,6 +48,7 @@ export default async function EventPage({ params }: PageProps<"/e/[id]">) {
           <Link className="icon-btn" href="/" aria-label={t.backToEvents}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><path d="m15 18-6-6 6-6" /></svg>
           </Link>
+          <Link className="icon-btn homebtn" href="/" aria-label="la nit">la nit<b>.</b></Link>
         </div>
       </div>
       <div className="edet">

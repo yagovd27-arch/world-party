@@ -42,7 +42,7 @@ export default async function Checkout({ searchParams }: PageProps<"/checkout">)
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><path d="m15 18-6-6 6-6" /></svg>
         </Link>
         <span className="logo" style={{ fontSize: 20 }}>{t.pay}</span>
-        <span style={{ width: 42 }} />
+        <Link className="icon-btn homebtn" href="/" aria-label="la nit">la nit<b>.</b></Link>
       </header>
       <section className="section">
         <div className="card">
