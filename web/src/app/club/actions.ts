@@ -3,7 +3,7 @@ import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { getUser, isAdmin, requireClub } from "@/lib/auth";
-import { getPromoterByCode, normalizeCode, rankingForClub } from "@/lib/promoters";
+import { CODE_RE, getPromoterByCode, normalizeCode, rankingForClub } from "@/lib/promoters";
 import { tzFor, zonedToUtc } from "@/lib/format";
 import { supabaseAdmin, supabaseServer } from "@/lib/supabase/server";
 import { getT } from "@/lib/lang";
@@ -250,6 +250,31 @@ export async function addClubPromoter(form: FormData) {
   if (error) { console.error("[addClubPromoter]", error.message); prBack("e=" + encodeURIComponent(k.eSave)); }
   revalidatePath("/club/prs");
   prBack("n=" + encodeURIComponent(k.nAdded(p!.code)));
+}
+
+/** El club crea un código para un PR que no tiene cuenta (y lo añade con su %). */
+export async function createClubPromoterCode(form: FormData) {
+  const k = (await getT()).t.pr.club;
+  const club = await prClub();
+  const name = str(form, "name", 60);
+  const code = normalizeCode(str(form, "code", 20));
+  const email = str(form, "email", 120).toLowerCase();
+  const pct = Number(str(form, "pct", 6).replace(",", "."));
+  if (name.length < 2) prBack("e=" + encodeURIComponent(k.eName));
+  if (!CODE_RE.test(code)) prBack("e=" + encodeURIComponent(k.eCodeFmt));
+  if (!Number.isFinite(pct) || pct < 0 || pct > 50) prBack("e=" + encodeURIComponent(k.ePct));
+  const sb = supabaseAdmin();
+  const { data: p, error } = await sb.from("promoters")
+    .insert({ user_id: null, code, name, email: /^\S+@\S+\.\S+$/.test(email) ? email : "", created_by_club: club.id })
+    .select("id").single();
+  if (error || !p) {
+    if (error?.code === "23505") prBack("e=" + encodeURIComponent(k.eTaken));
+    console.error("[createClubPromoterCode]", error?.message);
+    prBack("e=" + encodeURIComponent(k.eSave));
+  }
+  await sb.from("club_promoters").upsert({ club_id: club.id, promoter_id: p!.id, commission_pct: pct }, { onConflict: "club_id,promoter_id" });
+  revalidatePath("/club/prs");
+  prBack("n=" + encodeURIComponent(k.nCreated(code)));
 }
 
 /** Cambia el % de comisión de un PR. */

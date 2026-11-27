@@ -21,7 +21,7 @@ export function prLevel(tickets: number) {
 export const CODE_RE = /^[A-Z0-9]{3,16}$/;
 export const normalizeCode = (s: string) => s.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 16);
 
-export type Promoter = { id: string; user_id: string; code: string; name: string; email: string; created_at: string };
+export type Promoter = { id: string; user_id: string | null; code: string; name: string; email: string; created_at: string; created_by_club: string | null };
 
 export async function getPromoterByCode(code: string): Promise<Promoter | null> {
   const c = normalizeCode(code);
@@ -30,9 +30,18 @@ export async function getPromoterByCode(code: string): Promise<Promoter | null> 
   return (data as Promoter) ?? null;
 }
 
-export async function getMyPromoter(userId: string): Promise<Promoter | null> {
-  const { data } = await supabaseAdmin().from("promoters").select("*").eq("user_id", userId).maybeSingle();
-  return (data as Promoter) ?? null;
+/**
+ * El código de PR del usuario. Si no tiene, pero un club le creó uno con su email,
+ * se lo asigna (así el PR ve su panel sin tener que crear otro código).
+ */
+export async function getMyPromoter(userId: string, email?: string | null): Promise<Promoter | null> {
+  const sb = supabaseAdmin();
+  const { data } = await sb.from("promoters").select("*").eq("user_id", userId).maybeSingle();
+  if (data || !email) return (data as Promoter) ?? null;
+  const { data: open } = await sb.from("promoters").select("*").is("user_id", null).ilike("email", email.trim().replace(/[%_\\]/g, "\\$&")).limit(1).maybeSingle();
+  if (!open) return null;
+  const { data: claimed } = await sb.from("promoters").update({ user_id: userId }).eq("id", (open as Promoter).id).is("user_id", null).select("*").maybeSingle();
+  return (claimed as Promoter) ?? null;
 }
 
 type SaleRow = {

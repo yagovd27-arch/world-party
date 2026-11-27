@@ -10,7 +10,7 @@ export async function createPromoter(form: FormData) {
   const p = (await getT()).t.pr;
   const user = await getUser();
   if (!user?.email) redirect("/pr");
-  if (await getMyPromoter(user.id)) redirect("/pr");
+  if (await getMyPromoter(user.id, user.email)) redirect("/pr");
   const name = String(form.get("name") ?? "").trim().slice(0, 60);
   const code = normalizeCode(String(form.get("code") ?? ""));
   const back = (e: string) => redirect(`/pr?e=${encodeURIComponent(e)}&name=${encodeURIComponent(name)}&code=${encodeURIComponent(code)}`);

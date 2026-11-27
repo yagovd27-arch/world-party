@@ -126,7 +126,7 @@ export default async function Perfil() {
   }
 
   const email = user.email ?? "";
-  const [h, cities, pr] = await Promise.all([email ? history(email) : Promise.resolve({ tickets: 0, points: 0, events: 0, cities: 0 }), getCities(), getMyPromoter(user.id)]);
+  const [h, cities, pr] = await Promise.all([email ? history(email) : Promise.resolve({ tickets: 0, points: 0, events: 0, cities: 0 }), getCities(), getMyPromoter(user.id, user.email)]);
   const { city } = await currentCity(cities);
   const points = h.points;
   const { cur, next, pct } = level(points);

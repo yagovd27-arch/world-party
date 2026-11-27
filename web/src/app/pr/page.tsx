@@ -59,7 +59,7 @@ export default async function PrPanel({ searchParams }: PageProps<"/pr">) {
     );
   }
 
-  const me = await getMyPromoter(user.id);
+  const me = await getMyPromoter(user.id, user.email);
   if (!me) {
     const err = typeof sp.e === "string" ? sp.e : "";
     const name = typeof sp.name === "string" ? sp.name : "";

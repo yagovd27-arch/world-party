@@ -6,7 +6,7 @@ import { getT } from "@/lib/lang";
 import { rankingForClub } from "@/lib/promoters";
 import SubmitButton from "@/components/SubmitButton";
 import ClubTop from "../_ui/ClubTop";
-import { addClubPromoter, markClubPromoterPaid, removeClubPromoter, setClubPromoterPct } from "../actions";
+import { addClubPromoter, createClubPromoterCode, markClubPromoterPaid, removeClubPromoter, setClubPromoterPct } from "../actions";
 
 export const metadata = { title: "PRs · la nit for clubs" };
 
@@ -67,7 +67,7 @@ export default async function ClubPrs({ searchParams }: PageProps<"/club/prs">) 
                   <span className="rank-pos">{i + 1}</span>
                   <span className="rank-who">
                     <b>{r.code}</b>
-                    <span>{r.name} · {r.email}</span>
+                    <span>{r.email ? `${r.name} · ${r.email}` : r.name}</span>
                   </span>
                   <span className="rank-num"><b>{r.tickets}</b><span>{k.cTickets.toLowerCase()}</span></span>
                 </div>
@@ -117,8 +117,31 @@ export default async function ClubPrs({ searchParams }: PageProps<"/club/prs">) 
 
       {canEdit && (
         <section className="section">
+          <form action={createClubPromoterCode} className="card" style={{ marginBottom: 14 }}>
+            <h2 className="psub">{k.createTitle}</h2>
+            <p className="fine" style={{ marginBottom: 12 }}>{k.createHelp}</p>
+            <div className="field">
+              <label htmlFor="c-name">{k.prName}</label>
+              <input id="c-name" name="name" required minLength={2} maxLength={60} />
+            </div>
+            <div className="addpr">
+              <div className="field">
+                <label htmlFor="c-code">{k.code}</label>
+                <input id="c-code" name="code" required minLength={3} maxLength={16} pattern="[A-Za-z0-9]{3,16}" style={{ textTransform: "uppercase", letterSpacing: 1.2, fontWeight: 700 }} autoCapitalize="characters" autoComplete="off" />
+              </div>
+              <div className="field">
+                <label htmlFor="c-pct">{k.pct}</label>
+                <input id="c-pct" name="pct" type="number" min={0} max={50} step="0.5" defaultValue={10} required />
+              </div>
+            </div>
+            <div className="field">
+              <label htmlFor="c-email">{k.prEmail}</label>
+              <input id="c-email" name="email" type="email" maxLength={120} autoComplete="off" />
+            </div>
+            <SubmitButton className="cta gold block">{k.create}</SubmitButton>
+          </form>
           <form action={addClubPromoter} className="card">
-            <h2 className="psub">{k.addTitle}</h2>
+            <h2 className="psub">{k.haveCode}</h2>
             <p className="fine" style={{ marginBottom: 12 }}>{k.addHelp}</p>
             <div className="addpr">
               <div className="field">
