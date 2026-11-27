@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import Pin from "./Pin";
-import { money, parts, tzFor } from "@/lib/format";
+import { money, parts, shortDate, tzFor } from "@/lib/format";
 import type { City, EventItem } from "@/lib/types";
 import { dict, type Lang } from "@/lib/i18n";
 
@@ -11,7 +11,8 @@ export function fromPrice(e: EventItem) {
 }
 
 /** Tarjeta compacta de la cartelera: flyer, nombre, club y precio. */
-export default function EventCard({ e, city, lang }: { e: EventItem; city: City; lang: Lang }) {
+/** withDay: muestra también el día y la ciudad (cuando la tarjeta sale fuera de su ciudad). */
+export default function EventCard({ e, city, lang, withDay = false }: { e: EventItem; city: City; lang: Lang; withDay?: boolean }) {
   const t = dict(lang);
   const from = fromPrice(e);
   const early = e.ticket_types.find((x) => /early/i.test(x.name));
@@ -26,7 +27,7 @@ export default function EventCard({ e, city, lang }: { e: EventItem; city: City;
         <h3>{e.title}</h3>
         <p className="ecard-place"><Pin size={12} /><span>{e.club.name}</span></p>
         <p className="ecard-meta">
-          <span>{t.hour(parts(e.starts_at, tzFor(e.city_id)).time)}</span>
+          <span>{withDay ? `${shortDate(e.starts_at, tzFor(e.city_id), lang)}, ${city.name}` : t.hour(parts(e.starts_at, tzFor(e.city_id)).time)}</span>
           <span className="price">{from === null ? t.soldOut : t.from(money(from, city.currency_symbol))}</span>
         </p>
       </div>

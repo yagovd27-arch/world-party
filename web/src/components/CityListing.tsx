@@ -67,8 +67,8 @@ export default async function CityListing({ city, cities, events, sel, base, lan
       )}
       {other.length > 0 && (
         <section className="daygroup">
-          <h2 className="dayhead"><b>{t.elsewhere}</b></h2>
-          <div className="posters">{other.map((e) => <EventCard key={e.id} e={e} city={cityOf(e.city_id)} lang={lang} />)}</div>
+          <h2 className="dayhead plain"><b>{t.elsewhere}</b></h2>
+          <div className="posters">{other.map((e) => <EventCard key={e.id} e={e} city={cityOf(e.city_id)} lang={lang} withDay />)}</div>
         </section>
       )}
       <footer className="about">
