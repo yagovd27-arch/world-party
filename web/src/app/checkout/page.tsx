@@ -9,6 +9,7 @@ import { getPromoterByCode } from "@/lib/promoters";
 import { getT } from "@/lib/lang";
 import { canSell, payMethods } from "@/lib/payments";
 import { legalReady } from "@/lib/legal";
+import { emailOn } from "@/lib/email";
 import { cookies } from "next/headers";
 
 export default async function Checkout({ searchParams }: PageProps<"/checkout">) {
@@ -52,7 +53,7 @@ export default async function Checkout({ searchParams }: PageProps<"/checkout">)
             <div className="sum" key={t.id}><span>{qty} × {t.name}</span><span>{money(qty * t.price, city.currency_symbol)}</span></div>
           ))}
         </div>
-        {!canSell(city.currency, admin) ? <p className="notice">{t.salesSoon}</p> : <CheckoutForm eventId={e.id} items={lines.map(({ t, qty }) => ({ id: t.id, qty }))} subtotal={subtotal} prOff={prOff} feeRate={feeRateFor(e.club)} symbol={city.currency_symbol} defaultEmail={user?.email ?? ""} defaultPromo={promoOk ? pr : ""} defaultPromoOk={promoOk} methods={payMethods(city.currency, admin)} note={payMethods(city.currency, admin).includes("card") ? t.cardNote : payMethods(city.currency, admin)[0] === "upi" ? t.upi.checkoutNote : undefined} />}
+        {!canSell(city.currency, admin) ? <p className="notice">{t.salesSoon}</p> : <CheckoutForm eventId={e.id} items={lines.map(({ t, qty }) => ({ id: t.id, qty }))} subtotal={subtotal} prOff={prOff} feeRate={feeRateFor(e.club)} symbol={city.currency_symbol} defaultEmail={user?.email ?? ""} defaultPromo={promoOk ? pr : ""} defaultPromoOk={promoOk} methods={payMethods(city.currency, admin)} note={payMethods(city.currency, admin).includes("card") ? (emailOn ? t.cardNote : t.cardNoteWeb) : payMethods(city.currency, admin)[0] === "upi" ? t.upi.checkoutNote : undefined} />}
         {legalReady && (
           <p className="fine" style={{ marginTop: 10, textAlign: "center" }}>
             {t.acceptTerms} <Link href="/terms" style={{ textDecoration: "underline" }}>{t.termsLink}</Link>, <Link href="/refunds" style={{ textDecoration: "underline" }}>{t.refundsLink}</Link>

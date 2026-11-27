@@ -152,6 +152,12 @@ export default async function ClubEvent({ params, searchParams }: PageProps<"/cl
       )}
 
       <h2 className="ghead">{c.buyers(orders.length)}</h2>
+      {orders.length > 0 && (
+        <div className="section" style={{ paddingTop: 8 }}>
+          <a className="pill" href={`/club/eventos/${e.id}/compradores`} download>{c.downloadCsv}</a>
+          <span className="fine" style={{ marginLeft: 10 }}>{c.downloadCsvHelp}</span>
+        </div>
+      )}
       <div className="section" style={{ paddingTop: 10, overflowX: "auto" }}>
         {orders.length ? (
           <table className="t">

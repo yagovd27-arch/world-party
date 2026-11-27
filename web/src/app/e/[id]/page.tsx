@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 import TicketPicker from "./TicketPicker";
 import { canSell } from "@/lib/payments";
 import { getCity, getEvent } from "@/lib/data";
-import { dayLabel, parts, tzFor } from "@/lib/format";
+import { dayLabel, money, parts, tzFor } from "@/lib/format";
 import { cityName } from "@/lib/i18n";
 import { isAdmin } from "@/lib/auth";
 import { getT } from "@/lib/lang";
@@ -39,6 +39,7 @@ export default async function EventPage({ params }: PageProps<"/e/[id]">) {
 
   const p = parts(e.starts_at, tz);
   const kind = t.kind[e.type] ?? e.type;
+  const maxOff = Math.max(0, ...e.ticket_types.map((x) => Math.min(x.pr_discount ?? 0, x.price)));
 
   return (
     <main className="shell event" style={{ paddingBottom: 120 }}>
@@ -72,6 +73,7 @@ export default async function EventPage({ params }: PageProps<"/e/[id]">) {
         </dl>
         {e.description && <p className="desc">{e.description}</p>}
         <h2 className="etickets">{t.tickets}</h2>
+        {maxOff > 0 && <p className="fine" style={{ marginTop: -4, marginBottom: 10 }}>{t.pr.eventHint(money(maxOff, city.currency_symbol))}</p>}
         <TicketPicker eventId={e.id} symbol={city.currency_symbol} tiers={e.ticket_types} salesOn={canSell(city.currency, await isAdmin())} />
       </div>
     </main>
