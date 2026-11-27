@@ -40,6 +40,15 @@ export async function getCityEvents(cityId: string): Promise<EventItem[]> {
   return ((data as unknown as EventItem[]) ?? []).map(sortTiers);
 }
 
+/** Próximos eventos de todas las ciudades (para cuando una ciudad aún está vacía). */
+export async function getUpcomingAll(limit = 8): Promise<EventItem[]> {
+  const since = new Date(Date.now() - 6 * 3600e3).toISOString();
+  if (!isSupabaseOn) return DEMO_EVENTS.filter((e) => e.starts_at >= since).slice(0, limit);
+  const sb = await supabaseServer();
+  const { data } = await sb.from("events").select(EVENT_SELECT).eq("status", "published").gte("starts_at", since).order("starts_at").limit(limit);
+  return ((data as unknown as EventItem[]) ?? []).map(sortTiers);
+}
+
 export async function getEvent(id: string): Promise<EventItem | undefined> {
   if (!isSupabaseOn) return DEMO_EVENTS.find((e) => e.id === id);
   const sb = await supabaseServer();
