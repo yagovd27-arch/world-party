@@ -5,6 +5,7 @@ import { getUser, isAdmin } from "@/lib/auth";
 import { getCity, getEvent } from "@/lib/data";
 import { dayLabel, money, parts, serviceFee, tzFor } from "@/lib/format";
 import { feeRateFor } from "@/lib/types";
+import { getPromoterByCode } from "@/lib/promoters";
 import { getT } from "@/lib/lang";
 import { canSell, payMethods } from "@/lib/payments";
 import { legalReady } from "@/lib/legal";
@@ -26,12 +27,13 @@ export default async function Checkout({ searchParams }: PageProps<"/checkout">)
   });
   if (!lines.length) notFound();
   const subtotal = lines.reduce((s, l) => s + l.qty * l.t.price, 0);
-  const fee = serviceFee(subtotal, feeRateFor(e.club));
+  const prOff = lines.reduce((s, l) => s + l.qty * Math.min(l.t.pr_discount ?? 0, l.t.price), 0);
   const tz = tzFor(e.city_id);
   const user = await getUser();
   const { lang, t } = await getT();
   const admin = await isAdmin();
   const pr = (await cookies()).get("pr")?.value ?? "";
+  const promoOk = /^[A-Z0-9]{3,16}$/.test(pr) && Boolean(await getPromoterByCode(pr));
 
   return (
     <main className="shell">
@@ -49,10 +51,8 @@ export default async function Checkout({ searchParams }: PageProps<"/checkout">)
           {lines.map(({ t, qty }) => (
             <div className="sum" key={t.id}><span>{qty} × {t.name}</span><span>{money(qty * t.price, city.currency_symbol)}</span></div>
           ))}
-          {fee > 0 && <div className="sum"><span>{t.serviceFee}</span><span>{money(fee, city.currency_symbol)}</span></div>}
-          <div className="sum total"><span>{t.total}</span><span>{money(subtotal + fee, city.currency_symbol)}</span></div>
         </div>
-        {!canSell(city.currency, admin) ? <p className="notice">{t.salesSoon}</p> : <CheckoutForm eventId={e.id} items={lines.map(({ t, qty }) => ({ id: t.id, qty }))} totalLabel={money(subtotal + fee, city.currency_symbol)} defaultEmail={user?.email ?? ""} defaultPromo={/^[A-Z0-9]{3,16}$/.test(pr) ? pr : ""} methods={payMethods(city.currency, admin)} note={payMethods(city.currency, admin).includes("card") ? t.cardNote : payMethods(city.currency, admin)[0] === "upi" ? t.upi.checkoutNote : undefined} />}
+        {!canSell(city.currency, admin) ? <p className="notice">{t.salesSoon}</p> : <CheckoutForm eventId={e.id} items={lines.map(({ t, qty }) => ({ id: t.id, qty }))} subtotal={subtotal} prOff={prOff} feeRate={feeRateFor(e.club)} symbol={city.currency_symbol} defaultEmail={user?.email ?? ""} defaultPromo={promoOk ? pr : ""} defaultPromoOk={promoOk} methods={payMethods(city.currency, admin)} note={payMethods(city.currency, admin).includes("card") ? t.cardNote : payMethods(city.currency, admin)[0] === "upi" ? t.upi.checkoutNote : undefined} />}
         {legalReady && (
           <p className="fine" style={{ marginTop: 10, textAlign: "center" }}>
             {t.acceptTerms} <Link href="/terms" style={{ textDecoration: "underline" }}>{t.termsLink}</Link> · <Link href="/refunds" style={{ textDecoration: "underline" }}>{t.refundsLink}</Link>

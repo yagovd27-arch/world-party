@@ -17,6 +17,8 @@ export type TicketType = {
   sold: number;
   sales_end: string | null;
   sort: number;
+  /** Descuento por entrada si se compra con un código de PR. */
+  pr_discount?: number;
 };
 
 export type EventType = "club" | "concierto" | "fiesta";

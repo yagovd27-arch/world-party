@@ -1,6 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { money, serviceFee } from "@/lib/format";
 import { saveLocalOrder, saveOrderRef } from "@/lib/local-orders";
 import { useT } from "@/components/LangProvider";
 
@@ -24,13 +25,37 @@ function loadRazorpay(): Promise<boolean> {
 
 type Method = "razorpay" | "card" | "upi";
 
-export default function CheckoutForm({ eventId, items, totalLabel, defaultEmail, defaultPromo = "", note, methods = [] }: { eventId: string; items: { id: string; qty: number }[]; totalLabel: string; defaultEmail: string; defaultPromo?: string; note?: string; methods?: Method[] }) {
+export default function CheckoutForm({ eventId, items, subtotal, prOff, feeRate, symbol, defaultEmail, defaultPromo = "", defaultPromoOk = false, note, methods = [] }: {
+  eventId: string; items: { id: string; qty: number }[];
+  /** Precio de las entradas, el descuento total si hay código de PR válido, % de cargo y símbolo de moneda. */
+  subtotal: number; prOff: number; feeRate: number; symbol: string;
+  defaultEmail: string; defaultPromo?: string; defaultPromoOk?: boolean; note?: string; methods?: Method[];
+}) {
   const router = useRouter();
   const t = useT();
   const [name, setName] = useState("");
   const [email, setEmail] = useState(defaultEmail);
   const [phone, setPhone] = useState("");
   const [promo, setPromo] = useState(defaultPromo);
+  const [promoOk, setPromoOk] = useState(defaultPromoOk);
+  const [promoBad, setPromoBad] = useState(false);
+
+  // Comprueba el código de PR mientras se escribe para aplicar el descuento al momento.
+  useEffect(() => {
+    if (promo.length < 3) return;
+    let live = true;
+    const id = setTimeout(async () => {
+      try {
+        const r = await fetch(`/api/pr/${encodeURIComponent(promo)}`).then((x) => x.json());
+        if (live) { setPromoOk(Boolean(r.ok)); setPromoBad(!r.ok); }
+      } catch { /* sin red: se valida al pagar */ }
+    }, 350);
+    return () => { live = false; clearTimeout(id); };
+  }, [promo]);
+
+  const off = promoOk ? prOff : 0;
+  const fee = serviceFee(subtotal - off, feeRate);
+  const totalLabel = money(subtotal - off + fee, symbol);
   const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);
 
@@ -111,7 +136,15 @@ export default function CheckoutForm({ eventId, items, totalLabel, defaultEmail,
       <div className="field"><label htmlFor="n">{t.fullName}</label><input id="n" autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} /></div>
       <div className="field"><label htmlFor="em">{t.email}</label><input id="em" type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} /></div>
       <div className="field"><label htmlFor="ph">{t.phoneWa}</label><input id="ph" type="tel" autoComplete="tel" value={phone} onChange={(e) => setPhone(e.target.value)} /></div>
-      <div className="field"><label htmlFor="pr">{t.pr.checkoutLabel}</label><input id="pr" autoComplete="off" autoCapitalize="characters" maxLength={16} placeholder={t.pr.checkoutPh} value={promo} onChange={(e) => setPromo(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ""))} style={{ letterSpacing: 1, fontWeight: 600 }} /></div>
+      <div className="field"><label htmlFor="pr">{t.pr.checkoutLabel}</label><input id="pr" autoComplete="off" autoCapitalize="characters" maxLength={16} placeholder={t.pr.checkoutPh} value={promo} onChange={(e) => { setPromo(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "")); setPromoOk(false); setPromoBad(false); }} style={{ letterSpacing: 1, fontWeight: 600 }} />
+        {promoOk && <span className="fine" style={{ color: "var(--gold-2)" }}>✓ {t.pr.applied}</span>}
+        {promoBad && promo.length >= 3 && <span className="fine" style={{ color: "#ff9b9b" }}>{t.pr.eCheckout}</span>}
+      </div>
+      <div className="sumbox">
+        {off > 0 && <div className="sum"><span>{t.pr.discount(promo)}</span><span>−{money(off, symbol)}</span></div>}
+        {fee > 0 && <div className="sum"><span>{t.serviceFee}</span><span>{money(fee, symbol)}</span></div>}
+        <div className="sum total"><span>{t.total}</span><span>{totalLabel}</span></div>
+      </div>
       {methods.includes("card") ? (
         <>
           <button className="cta block gold paybtn" data-m="card" disabled={busy}>

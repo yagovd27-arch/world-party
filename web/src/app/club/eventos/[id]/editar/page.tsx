@@ -13,7 +13,7 @@ export const metadata = { title: "la nit for clubs" };
 type Row = {
   id: string; club_id: string; city_id: string; title: string; description: string | null; lineup: string[]; type: string;
   starts_at: string; image_url: string | null; min_age: number; dress_code: string | null; status: string;
-  ticket_types: { id: string; name: string; description: string | null; price: number; capacity: number; sold: number; sales_end: string | null; sort: number }[];
+  ticket_types: { id: string; name: string; description: string | null; price: number; capacity: number; sold: number; sales_end: string | null; sort: number; pr_discount?: number }[];
 };
 
 export default async function EditEvent({ params }: PageProps<"/club/eventos/[id]/editar">) {
@@ -44,7 +44,7 @@ export default async function EditEvent({ params }: PageProps<"/club/eventos/[id
             id: e.id, title: e.title, description: e.description ?? "", lineup: e.lineup.join(", "), type: e.type,
             startsLocal: utcToLocalInput(e.starts_at, tz), imageUrl: e.image_url ?? "", minAge: e.min_age, dressCode: e.dress_code ?? "",
             status: e.status,
-            tiers: tiers.map((t) => ({ id: t.id, name: t.name, description: t.description ?? "", price: t.price, capacity: t.capacity, salesEnd: t.sales_end ? utcToLocalInput(t.sales_end, tz) : "" })),
+            tiers: tiers.map((t) => ({ id: t.id, name: t.name, description: t.description ?? "", price: t.price, capacity: t.capacity, prDiscount: t.pr_discount ?? 0, salesEnd: t.sales_end ? utcToLocalInput(t.sales_end, tz) : "" })),
             sold: Object.fromEntries(tiers.map((t) => [t.id, t.sold])),
           }}
         />

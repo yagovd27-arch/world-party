@@ -51,7 +51,7 @@ export async function createClub(form: FormData) {
   redirect("/club");
 }
 
-export type TierInput = { id?: string; name: string; description: string; price: number; capacity: number; salesEnd: string };
+export type TierInput = { id?: string; name: string; description: string; price: number; capacity: number; salesEnd: string; prDiscount?: number };
 export type EventInput = {
   id?: string; clubId: string; title: string; description: string; lineup: string; type: string;
   startsLocal: string; imageUrl: string; minAge: number; dressCode: string; publish: "keep" | "draft" | "publish"; tiers: TierInput[];
@@ -86,6 +86,7 @@ export async function saveEvent(input: EventInput): Promise<{ ok: true; id: stri
       description: t.description.trim().slice(0, 120) || null,
       price: Math.round(Number(t.price)),
       capacity: Math.round(Number(t.capacity)),
+      pr_discount: Math.min(Math.max(0, Math.round(Number(t.prDiscount) || 0)), Math.max(0, Math.round(Number(t.price)))),
       sales_end: t.salesEnd ? zonedToUtc(t.salesEnd, tzFor(club.city_id)) : null,
       sort: i,
     }));

@@ -68,19 +68,23 @@ export async function POST(req: Request) {
     if (t.sold + i.qty > t.capacity) return bad(m.notEnough(t.name));
     lines.push({ t, qty: i.qty });
   }
-  const subtotal = lines.reduce((s, l) => s + l.qty * l.t.price, 0);
-  const fee = serviceFee(subtotal, feeRateFor(event.club));
-  const total = subtotal + fee;
-  const currency = event.city.currency;
-
-  // Código de PR: si lo escribió y no existe, se avisa; comprarse a uno mismo no cuenta.
+  // Código de PR: si lo escribió y no existe, se avisa. Con código válido hay descuento;
+  // la venta cuenta para el PR salvo que se la compre él mismo.
   let promoter_id: string | null = null;
   const promo = normalizeCode(String(body.promoCode ?? ""));
+  let promoOk = false;
   if (promo) {
     const p = await getPromoterByCode(promo);
     if (!p) return bad(t.pr.eCheckout);
-    if (p.email.toLowerCase() !== buyer.email.trim().toLowerCase()) promoter_id = p.id;
+    promoOk = true;
+    if (!p.email || p.email.toLowerCase() !== buyer.email.trim().toLowerCase()) promoter_id = p.id;
   }
+  const off = (tt: { price: number; pr_discount?: number }) => (promoOk ? Math.min(tt.pr_discount ?? 0, tt.price) : 0);
+  const discount = lines.reduce((s, l) => s + l.qty * off(l.t), 0);
+  const subtotal = lines.reduce((s, l) => s + l.qty * (l.t.price - off(l.t)), 0);
+  const fee = serviceFee(subtotal, feeRateFor(event.club));
+  const total = subtotal + fee;
+  const currency = event.city.currency;
 
   const methods = payMethods(currency, await isAdmin());
   const method: PayMethod | null = body.method && methods.includes(body.method) ? body.method : methods[0] ?? null;
@@ -91,13 +95,13 @@ export async function POST(req: Request) {
     .from("orders")
     .insert({
       event_id: event.id, buyer_name: buyer.name, buyer_email: buyer.email, buyer_phone: buyer.phone ?? null,
-      subtotal, service_fee: fee, total, currency, payment_provider: provider,
+      subtotal, service_fee: fee, total, currency, payment_provider: provider, discount,
       ...(promoter_id ? { promoter_id } : {}),
     })
     .select("id, access_key")
     .single();
   if (oErr || !order) return bad(m.createFailed, 500);
-  await sb.from("order_items").insert(lines.map((l) => ({ order_id: order.id, ticket_type_id: l.t.id, qty: l.qty, unit_price: l.t.price })));
+  await sb.from("order_items").insert(lines.map((l) => ({ order_id: order.id, ticket_type_id: l.t.id, qty: l.qty, unit_price: l.t.price - off(l.t) })));
 
   if (method === "card") {
     try {
@@ -105,7 +109,7 @@ export async function POST(req: Request) {
       const s = await createCheckoutSession({
         orderId: order.id, currency, email: buyer.email.trim(), lang,
         lines: [
-          ...lines.map((l) => ({ name: `${event.title} · ${l.t.name}`, qty: l.qty, unit: l.t.price })),
+          ...lines.map((l) => ({ name: `${event.title} · ${l.t.name}${off(l.t) ? ` (${promo})` : ""}`, qty: l.qty, unit: l.t.price - off(l.t) })),
           ...(fee > 0 ? [{ name: t.serviceFee, qty: 1, unit: fee }] : []),
         ],
         successUrl: `${origin}/api/orders/${order.id}/stripe?k=${order.access_key}`,

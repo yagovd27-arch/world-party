@@ -60,7 +60,7 @@ export default function EventForm({ clubId, userId, currency, verified, initial 
   const set = (k: keyof typeof f) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
     setF({ ...f, [k]: k === "minAge" ? Number(e.target.value) : e.target.value });
   const setTier = (i: number, k: keyof TierInput, v: string) =>
-    setTiers(tiers.map((t, j) => (j === i ? { ...t, [k]: k === "price" || k === "capacity" ? Number(v) : v } : t)));
+    setTiers(tiers.map((t, j) => (j === i ? { ...t, [k]: k === "price" || k === "capacity" || k === "prDiscount" ? Number(v) : v } : t)));
 
   async function upload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -133,6 +133,7 @@ export default function EventForm({ clubId, userId, currency, verified, initial 
               <div className="field"><label>{c.tierCap}{t.id && sold[t.id] ? c.tierSoldN(sold[t.id]) : ""}</label><input type="number" min={1} inputMode="numeric" value={t.capacity} onChange={(e) => setTier(i, "capacity", e.target.value)} /></div>
               <div className="field"><label>{c.salesUntil}</label><input type="datetime-local" value={t.salesEnd} onChange={(e) => setTier(i, "salesEnd", e.target.value)} /></div>
             </div>
+            <div className="field"><label>{c.tierPrOff(currency)}</label><input type="number" min={0} inputMode="numeric" value={t.prDiscount ?? 0} onChange={(e) => setTier(i, "prDiscount", e.target.value)} /><span className="fine">{c.tierPrOffHelp}</span></div>
             <div className="field" style={{ marginBottom: 6 }}><label>{c.tierNote}</label><input value={t.description} onChange={(e) => setTier(i, "description", e.target.value)} maxLength={120} placeholder={c.tierNotePh} /></div>
             {!(t.id && sold[t.id]) && tiers.length > 1 && (
               <button type="button" className="fine" onClick={() => setTiers(tiers.filter((_, j) => j !== i))}>{c.removeTier}</button>
@@ -140,7 +141,7 @@ export default function EventForm({ clubId, userId, currency, verified, initial 
           </div>
         ))}
       </div>
-      <button type="button" className="pill" style={{ marginTop: 10 }} onClick={() => setTiers([...tiers, { name: "", description: "", price: 0, capacity: 50, salesEnd: "" }])}>{c.addTier}</button>
+      <button type="button" className="pill" style={{ marginTop: 10 }} onClick={() => setTiers([...tiers, { name: "", description: "", price: 0, capacity: 50, salesEnd: "", prDiscount: 0 }])}>{c.addTier}</button>
 
       <div style={{ display: "grid", gap: 10, marginTop: 24 }}>
         {isPublished ? (
