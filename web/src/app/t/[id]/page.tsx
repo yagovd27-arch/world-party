@@ -50,7 +50,7 @@ export default async function TicketPage({ params, searchParams }: PageProps<"/t
               <div><span>{t.date}</span><b>{shortDate(o.event.starts_at, tz, lang)}</b></div>
               <div><span>{t.time}</span><b>{t.hour(parts(o.event.starts_at, tz).time)}</b></div>
               <div><span>{t.venue}</span><b>{o.event.club.name}</b></div>
-              <div><span>{t.ticket}</span><b>{tk.ticket_type.name} · {i + 1}/{o.tickets.length}</b></div>
+              <div><span>{t.ticket}</span><b>{tk.ticket_type.name}, {i + 1}/{o.tickets.length}</b></div>
             </div>
           </div>
           <div className="perf" />

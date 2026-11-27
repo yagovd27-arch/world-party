@@ -66,8 +66,8 @@ export function dayLabel(iso: string, tz: string, lang: Lang) {
   const off = dayOffset(iso, tz);
   const s = shortDate(iso, tz, lang);
   const t = dict(lang);
-  if (off === 0) return `${t.today} · ${s}`;
-  if (off === 1) return `${t.tomorrow} · ${s}`;
+  if (off === 0) return `${t.today}, ${s}`;
+  if (off === 1) return `${t.tomorrow}, ${s}`;
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 

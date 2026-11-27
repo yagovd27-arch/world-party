@@ -15,7 +15,7 @@ const SITE = "https://lanit.club";
 
 export async function generateMetadata() {
   const { t } = await getT();
-  return { title: `${t.pr.title} · la nit`, description: t.pr.metaDesc };
+  return { title: `${t.pr.title} | la nit`, description: t.pr.metaDesc };
 }
 
 export default async function PrPanel({ searchParams }: PageProps<"/pr">) {
@@ -169,7 +169,7 @@ export default async function PrPanel({ searchParams }: PageProps<"/pr">) {
           <div className="prlinks">
             {s.upcoming.map((e) => (
               <div key={e.id}>
-                <span><b>{e.title}</b><span className="fine" style={{ display: "block" }}>{dayLabel(e.starts_at, tzFor(e.city_id), lang)} · {e.club.name}</span></span>
+                <span><b>{e.title}</b><span className="fine" style={{ display: "block" }}>{dayLabel(e.starts_at, tzFor(e.city_id), lang)}, {e.club.name}</span></span>
                 <CopyLink url={`${link}?e=${e.id}`} label={p.copy} copied={p.copied} />
               </div>
             ))}
@@ -184,7 +184,7 @@ export default async function PrPanel({ searchParams }: PageProps<"/pr">) {
             <tbody>
               {s.events.map((e) => (
                 <tr key={e.id}>
-                  <td>{e.title}<span className="fine" style={{ display: "block" }}>{dayLabel(e.starts_at, tzFor(e.city_id), lang)} · {e.club}</span></td>
+                  <td>{e.title}<span className="fine" style={{ display: "block" }}>{dayLabel(e.starts_at, tzFor(e.city_id), lang)}, {e.club}</span></td>
                   <td style={{ textAlign: "right", whiteSpace: "nowrap" }}>{p.ticketsN(e.tickets)}</td>
                 </tr>
               ))}

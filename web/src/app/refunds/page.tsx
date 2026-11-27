@@ -1,7 +1,7 @@
 import LegalPage from "@/components/LegalPage";
 import { LEGAL, legalReady } from "@/lib/legal";
 
-export const metadata = { title: "Refunds & cancellations · la nit", robots: { index: legalReady } };
+export const metadata = { title: "Refunds & cancellations | la nit", robots: { index: legalReady } };
 
 export default function Refunds() {
   return (

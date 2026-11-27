@@ -78,7 +78,7 @@ export default async function ClubEvent({ params, searchParams }: PageProps<"/cl
           <div style={{ minWidth: 0 }}>
             <span className={`st st-${e.status}`}>{c.status[e.status]}</span>
             <h1 style={{ fontSize: 24, fontWeight: 800, lineHeight: 1.15, marginTop: 6 }}>{e.title}</h1>
-            <span className="fine">{dayLabel(e.starts_at, tz, lang)} · {t.hour(parts(e.starts_at, tz).time)}</span>
+            <span className="fine">{dayLabel(e.starts_at, tz, lang)}, {t.hour(parts(e.starts_at, tz).time)}</span>
           </div>
         </div>
         {note && <p className="notice">{note}</p>}
@@ -105,7 +105,7 @@ export default async function ClubEvent({ params, searchParams }: PageProps<"/cl
             {pending.map((o) => (
               <div className="card" key={o.id}>
                 <div className="row">
-                  <span><b>{o.buyer_name}</b><span className="fine" style={{ display: "block" }}>{o.buyer_email}{o.buyer_phone ? ` · ${o.buyer_phone}` : ""}</span></span>
+                  <span><b>{o.buyer_name}</b><span className="fine" style={{ display: "block" }}>{o.buyer_email}{o.buyer_phone ? `, ${o.buyer_phone}` : ""}</span></span>
                   <span style={{ textAlign: "right" }}><b>{money(o.total, sym)}</b><span className="fine" style={{ display: "block" }}>{orderRef(o.id)}</span></span>
                 </div>
                 <div className="row">

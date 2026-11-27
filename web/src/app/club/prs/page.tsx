@@ -8,7 +8,7 @@ import SubmitButton from "@/components/SubmitButton";
 import ClubTop from "../_ui/ClubTop";
 import { addClubPromoter, createClubPromoterCode, markClubPromoterPaid, removeClubPromoter, setClubPromoterPct } from "../actions";
 
-export const metadata = { title: "PRs · la nit for clubs" };
+export const metadata = { title: "PRs | la nit for clubs" };
 
 export default async function ClubPrs({ searchParams }: PageProps<"/club/prs">) {
   const sp = await searchParams;
@@ -51,7 +51,7 @@ export default async function ClubPrs({ searchParams }: PageProps<"/club/prs">) 
             <Link href="/club/prs" className={!ev ? "on" : ""}>{k.all}</Link>
             {events.slice(0, 12).map((e) => (
               <Link key={e.id} href={`/club/prs?ev=${e.id}`} className={ev === e.id ? "on" : ""}>
-                {e.title} · {dayLabel(e.starts_at, tz, lang)}
+                {e.title}, {dayLabel(e.starts_at, tz, lang)}
               </Link>
             ))}
           </nav>
@@ -67,14 +67,14 @@ export default async function ClubPrs({ searchParams }: PageProps<"/club/prs">) 
                   <span className="rank-pos">{i + 1}</span>
                   <span className="rank-who">
                     <b>{r.code}</b>
-                    <span>{r.email ? `${r.name} · ${r.email}` : r.name}</span>
+                    <span>{r.email ? `${r.name} (${r.email})` : r.name}</span>
                   </span>
                   <span className="rank-num"><b>{r.tickets}</b><span>{k.cTickets.toLowerCase()}</span></span>
                 </div>
                 <div className="rank-bar"><i style={{ width: `${(r.tickets / top) * 100}%` }} /></div>
                 <div className="rank-meta">
                   <span><em>{k.cRevenue}</em> {money(r.revenue, sym)}</span>
-                  {r.added && <span><em>{k.cPct}</em> {r.pct}% · {money(ev ? r.commission : r.earned, sym)}</span>}
+                  {r.added && <span><em>{k.cPct}</em> {r.pct}% = {money(ev ? r.commission : r.earned, sym)}</span>}
                   {r.added && !ev && <span><em>{k.cOwed}</em> {money(r.owed, sym)}</span>}
                   {totTickets > 0 && r.tickets > 0 && !ev && <span><em>{k.share(Math.round((r.tickets / totTickets) * 100))}</em></span>}
                 </div>

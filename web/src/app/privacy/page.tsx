@@ -1,7 +1,7 @@
 import LegalPage from "@/components/LegalPage";
 import { LEGAL, legalReady, operator } from "@/lib/legal";
 
-export const metadata = { title: "Privacy policy · la nit", robots: { index: legalReady } };
+export const metadata = { title: "Privacy policy | la nit", robots: { index: legalReady } };
 
 export default function Privacy() {
   return (

@@ -8,7 +8,7 @@ import { getT } from "@/lib/lang";
 
 export async function generateMetadata() {
   const { t } = await getT();
-  return { title: `${t.nav.myTickets} · la nit` };
+  return { title: `${t.nav.myTickets} | la nit` };
 }
 
 type Row = {
@@ -42,9 +42,9 @@ export default async function Entradas() {
     return (
       <Link key={o.id} href={`/t/${o.id}?k=${o.access_key}`} className="card" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
         <span style={{ minWidth: 0 }}>
-          <span className="fine">{dayLabel(o.event.starts_at, tz, lang)} · {t.hour(parts(o.event.starts_at, tz).time)}</span>
+          <span className="fine">{dayLabel(o.event.starts_at, tz, lang)}, {t.hour(parts(o.event.starts_at, tz).time)}</span>
           <b style={{ display: "block", fontSize: 16 }}>{o.event.title}</b>
-          <span className="fine">{o.event.club.name} · {t.nTickets(o.tickets.length)}</span>
+          <span className="fine">{o.event.club.name}, {t.nTickets(o.tickets.length)}</span>
         </span>
         <span className="scarce">QR</span>
       </Link>

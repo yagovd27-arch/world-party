@@ -16,9 +16,9 @@ export async function generateMetadata({ params }: PageProps<"/e/[id]">) {
   const { lang, t } = await getT();
   const city = await getCity(e.city_id);
   const tz = tzFor(e.city_id);
-  const desc = [dayLabel(e.starts_at, tz, lang), e.club.name, city ? cityName(city, lang) : ""].filter(Boolean).join(" · ");
+  const desc = [dayLabel(e.starts_at, tz, lang), e.club.name, city ? cityName(city, lang) : ""].filter(Boolean).join(", ");
   return {
-    title: `${e.title} · la nit`,
+    title: `${e.title} | la nit`,
     description: e.description ? `${desc}. ${e.description.slice(0, 140)}` : desc,
     alternates: { canonical: `/e/${e.id}` },
     openGraph: { title: e.title, description: desc, type: "website", url: `/e/${e.id}`, images: e.image_url ? [{ url: e.image_url, alt: t.flyerOf(e.title) }] : undefined },

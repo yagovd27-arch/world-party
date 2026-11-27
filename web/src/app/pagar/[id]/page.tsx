@@ -7,7 +7,7 @@ import { orderRef, UPI_NAME, UPI_VPA, upiUri } from "@/lib/payments";
 import { isSupabaseOn, supabaseAdmin } from "@/lib/supabase/server";
 import UpiForm, { Vpa } from "./UpiForm";
 
-export const metadata = { title: "UPI · la nit", robots: { index: false } };
+export const metadata = { title: "UPI | la nit", robots: { index: false } };
 
 type Row = {
   id: string; status: string; total: number; currency: string; payment_provider: string | null; provider_payment_id: string | null;
@@ -35,7 +35,7 @@ export default async function PayUpi({ params, searchParams }: PageProps<"/pagar
   const amount = money(o.total, "₹");
   const head = (
     <div className="card">
-      <span className="fine">{dayLabel(o.event.starts_at, tz, lang)} · {t.hour(parts(o.event.starts_at, tz).time)} · {o.event.club.name}</span>
+      <span className="fine">{dayLabel(o.event.starts_at, tz, lang)}, {t.hour(parts(o.event.starts_at, tz).time)}, {o.event.club.name}</span>
       <h2 style={{ fontSize: 20, fontWeight: 800, margin: "4px 0 2px" }}>{o.event.title}</h2>
       <span className="fine">{u.order(ref)}</span>
     </div>

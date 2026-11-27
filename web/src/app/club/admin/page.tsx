@@ -34,10 +34,10 @@ export default async function AdminPage() {
               <div style={{ display: "flex", justifyContent: "space-between", gap: 10 }}>
                 <div>
                   <b style={{ fontSize: 17 }}>{cl.name}</b> <span className={`st ${cl.verified ? "st-published" : "st-draft"}`}>{cl.verified ? c.verified : c.pendingTag}</span>
-                  <div className="fine">{cl.city_id}{cl.area ? ` · ${cl.area}` : ""} · {owner ? email[owner.user_id] : c.noOwner}</div>
+                  <div className="fine">{cl.city_id}{cl.area ? `, ${cl.area}` : ""}. {owner ? email[owner.user_id] : c.noOwner}</div>
                   <div className="fine">
                     {cl.instagram && <a href={`https://instagram.com/${cl.instagram}`} target="_blank" rel="noreferrer" style={{ textDecoration: "underline" }}>@{cl.instagram}</a>}
-                    {cl.phone && <> · {cl.phone}</>}
+                    {cl.phone && <>, {cl.phone}</>}
                   </div>
                 </div>
               </div>

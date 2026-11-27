@@ -46,7 +46,7 @@ export default async function Checkout({ searchParams }: PageProps<"/checkout">)
       </header>
       <section className="section">
         <div className="card">
-          <span className="fine">{dayLabel(e.starts_at, tz, lang)} · {t.hour(parts(e.starts_at, tz).time)} · {e.club.name}</span>
+          <span className="fine">{dayLabel(e.starts_at, tz, lang)}, {t.hour(parts(e.starts_at, tz).time)}, {e.club.name}</span>
           <h2 style={{ fontSize: 20, fontWeight: 800, margin: "4px 0 10px" }}>{e.title}</h2>
           {lines.map(({ t, qty }) => (
             <div className="sum" key={t.id}><span>{qty} × {t.name}</span><span>{money(qty * t.price, city.currency_symbol)}</span></div>
@@ -55,7 +55,7 @@ export default async function Checkout({ searchParams }: PageProps<"/checkout">)
         {!canSell(city.currency, admin) ? <p className="notice">{t.salesSoon}</p> : <CheckoutForm eventId={e.id} items={lines.map(({ t, qty }) => ({ id: t.id, qty }))} subtotal={subtotal} prOff={prOff} feeRate={feeRateFor(e.club)} symbol={city.currency_symbol} defaultEmail={user?.email ?? ""} defaultPromo={promoOk ? pr : ""} defaultPromoOk={promoOk} methods={payMethods(city.currency, admin)} note={payMethods(city.currency, admin).includes("card") ? t.cardNote : payMethods(city.currency, admin)[0] === "upi" ? t.upi.checkoutNote : undefined} />}
         {legalReady && (
           <p className="fine" style={{ marginTop: 10, textAlign: "center" }}>
-            {t.acceptTerms} <Link href="/terms" style={{ textDecoration: "underline" }}>{t.termsLink}</Link> · <Link href="/refunds" style={{ textDecoration: "underline" }}>{t.refundsLink}</Link>
+            {t.acceptTerms} <Link href="/terms" style={{ textDecoration: "underline" }}>{t.termsLink}</Link>, <Link href="/refunds" style={{ textDecoration: "underline" }}>{t.refundsLink}</Link>
           </p>
         )}
       </section>

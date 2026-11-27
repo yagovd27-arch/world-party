@@ -23,7 +23,7 @@ import { getMyPromoter } from "@/lib/promoters";
 
 export async function generateMetadata() {
   const { t } = await getT();
-  return { title: `${t.nav.profile} · la nit` };
+  return { title: `${t.nav.profile} | la nit` };
 }
 
 /** 23 puntos por cada ₹100 gastados en entradas (en México, por cada $20, que es lo mismo aprox.). */
@@ -76,7 +76,7 @@ function MemberCard({ lvl, name, since, number, points, t }: { lvl: (typeof LEVE
       </div>
       <div className="member-foot">
         <span className="member-name">{name}</span>
-        <span>{t.profile.no} {number} · {t.profile.since} {since}</span>
+        <span>{t.profile.no} {number}, {t.profile.since} {since}</span>
       </div>
     </div>
   );

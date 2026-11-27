@@ -29,7 +29,7 @@ export async function sendTicketEmail(orderId: string, lang: Lang = "en") {
   if (!data) return { ok: false } as const;
   const o = data as unknown as Row;
   const tz = tzFor(o.event.city_id);
-  const when = `${shortDate(o.event.starts_at, tz, lang)} · ${t.hour(parts(o.event.starts_at, tz).time)}`;
+  const when = `${shortDate(o.event.starts_at, tz, lang)}, ${t.hour(parts(o.event.starts_at, tz).time)}`;
   const where = [o.event.club.name, o.event.club.address || o.event.club.area].filter(Boolean).join(", ");
   const link = `${SITE}/t/${o.id}?k=${o.access_key}`;
 
@@ -47,7 +47,7 @@ export async function sendTicketEmail(orderId: string, lang: Lang = "en") {
       <tr><td style="padding:18px 0;border-top:1px solid #eadfcd;text-align:center">
         <img src="cid:qr-${tk.code}" width="220" height="220" alt="QR ${tk.code}" style="display:block;margin:0 auto 8px">
         <div style="font:700 15px/1.3 Helvetica,Arial,sans-serif;letter-spacing:2px;color:#19050b">${tk.code}</div>
-        <div style="font:13px/1.4 Helvetica,Arial,sans-serif;color:#6b5a4c">${esc(tk.ticket_type.name)} · ${i + 1}/${o.tickets.length}</div>
+        <div style="font:13px/1.4 Helvetica,Arial,sans-serif;color:#6b5a4c">${esc(tk.ticket_type.name)}, ${i + 1}/${o.tickets.length}</div>
       </td></tr>`)
     .join("");
 

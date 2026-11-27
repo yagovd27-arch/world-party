@@ -110,7 +110,7 @@ export default async function ClubHome({ searchParams }: PageProps<"/club">) {
     return (
       <Link key={e.id} href={`/club/eventos/${e.id}`} className="card" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
         <span style={{ minWidth: 0 }}>
-          <span className="fine">{dayLabel(e.starts_at, tz, lang)} · {t.hour(parts(e.starts_at, tz).time)}</span>
+          <span className="fine">{dayLabel(e.starts_at, tz, lang)}, {t.hour(parts(e.starts_at, tz).time)}</span>
           <b style={{ display: "block", fontSize: 16 }}>{e.title}</b>
           <span className={`st st-${e.status}`}>{c.status[e.status]}</span>
         </span>
@@ -128,7 +128,7 @@ export default async function ClubHome({ searchParams }: PageProps<"/club">) {
       <section className="section">
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", gap: 12, flexWrap: "wrap" }}>
           <div>
-            <span className="fine">{club.area ? `${club.area} · ` : ""}{clubCity ? cityName(clubCity, lang) : ""}</span>
+            <span className="fine">{club.area ? `${club.area}, ` : ""}{clubCity ? cityName(clubCity, lang) : ""}</span>
             <h1 style={{ fontSize: 28, fontWeight: 800 }}>{club.name}</h1>
           </div>
           <Link href="/club/eventos/nuevo" className="cta">{c.newEvent}</Link>

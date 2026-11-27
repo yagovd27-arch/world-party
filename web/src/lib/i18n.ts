@@ -18,7 +18,7 @@ const es = {
   hour: (t: string) => `${t} h`,
 
   // General
-  meta: { title: "la nit — fiestas y entradas de club en Delhi, CDMX y Puebla", desc: "Encuentra los eventos de los mejores clubs de tu ciudad y compra tus entradas en segundos." },
+  meta: { title: "la nit | Fiestas y entradas de discoteca", desc: "Qué hay esta noche en tu ciudad, con la entrada en el móvil." },
   nav: { events: "Eventos", tickets: "Entradas", myTickets: "Mis entradas", profile: "Perfil", main: "Principal" },
   back: "Volver",
   cityAria: (c: string) => `Ciudad: ${c}. Cambiar ciudad`,
@@ -61,7 +61,7 @@ const es = {
   // Ciudades
   chooseCity: "Elige ciudad",
   yourCity: "Tu ciudad",
-  cityEvents: (country: string, n: number) => `${country} · ${n === 1 ? "1 evento" : `${n} eventos`}`,
+  cityEvents: (country: string, n: number) => `${country}, ${n === 1 ? "1 evento" : `${n} eventos`}`,
   cityMissing: "¿Tu ciudad no está? Pronto llegamos a más ciudades.",
 
   // Pago
@@ -77,8 +77,8 @@ const es = {
   cardSub: "Tarjeta, Google Pay o Apple Pay",
   payUpi: "Pagar con UPI",
   upiAlt: "¿Tu tarjeta no funciona? Paga con UPI desde Google Pay, PhonePe o Paytm.",
-  cardNote: "Pago seguro con Stripe. Recibes tu entrada con QR al instante.",
-  payNote: "Pago seguro con UPI o tarjeta. Recibirás tu entrada con QR al instante.",
+  cardNote: "Pagas con Stripe y la entrada con QR te llega al email.",
+  payNote: "Pagas con UPI o tarjeta y la entrada con QR te llega al email.",
   acceptTerms: "Al pagar aceptas los",
   termsLink: "términos",
   refundsLink: "reembolsos",
@@ -113,7 +113,7 @@ const es = {
   },
 
   // Entrada
-  youreIn: "¡Ya estás dentro!",
+  youreIn: "Ya tienes tus entradas",
   showQr: "Enseña este QR en la puerta. También lo tienes en “Entradas”.",
   myTicketsBack: "← Mis entradas",
   notPaid: (s: string) => `Este pedido no está pagado (${s}).`,
@@ -130,7 +130,7 @@ const es = {
   noTickets: "Aún no tienes entradas",
   noTicketsSub: "Cuando compres, tu QR aparece aquí.",
   seeEvents: "Ver eventos",
-  boughtHere: (i: number) => `Entradas compradas en este móvil · ${i}`,
+  boughtHere: (i: number) => `Entradas compradas en este móvil (${i})`,
   seeQr: "Ver QR",
   demoPurchase: "Compra de prueba (modo demo)",
   loginToSee: "Entra con tu email",
@@ -226,7 +226,7 @@ const es = {
     hi: (n: string) => `Hola ${n}, ya estás dentro.`,
     showAtDoor: "Enseña cada QR en la puerta. Cada código vale para una persona y una sola entrada.",
     open: "Ver mis entradas",
-    footer: "Si no compraste estas entradas, ignora este email. la nit · lanit.club",
+    footer: "Si no compraste estas entradas, ignora este email. lanit.club",
   },
 
   // Panel de clubs
@@ -473,7 +473,7 @@ const en: Dict = {
   memberSince: (m, y) => `${m} ${y}`,
   hour: (t) => t,
 
-  meta: { title: "la nit — club nights and party tickets in Delhi", desc: "Find events at the best clubs in Delhi NCR and get your tickets in seconds." },
+  meta: { title: "la nit | Club nights and party tickets", desc: "What's on tonight in your city, with the ticket on your phone." },
   nav: { events: "Events", tickets: "Tickets", myTickets: "My tickets", profile: "Profile", main: "Main" },
   back: "Back",
   cityAria: (c) => `City: ${c}. Change city`,
@@ -513,7 +513,7 @@ const en: Dict = {
 
   chooseCity: "Choose city",
   yourCity: "Your city",
-  cityEvents: (country, n) => `${country} · ${n === 1 ? "1 event" : `${n} events`}`,
+  cityEvents: (country, n) => `${country}, ${n === 1 ? "1 event" : `${n} events`}`,
   cityMissing: "Your city isn't here? More cities coming soon.",
 
   pay: "Checkout",
@@ -528,8 +528,8 @@ const en: Dict = {
   cardSub: "Card, Google Pay or Apple Pay",
   payUpi: "Pay with UPI",
   upiAlt: "Card not working? Pay with UPI from Google Pay, PhonePe or Paytm.",
-  cardNote: "Secure payment by Stripe. You'll get your QR ticket instantly.",
-  payNote: "Secure payment by UPI or card. You'll get your QR ticket instantly.",
+  cardNote: "You pay with Stripe and the QR ticket goes to your email.",
+  payNote: "You pay with UPI or card and the QR ticket goes to your email.",
   acceptTerms: "By paying you accept the",
   termsLink: "terms",
   refundsLink: "refunds policy",
@@ -563,7 +563,7 @@ const en: Dict = {
     soldOutRefund: "Tickets sold out while you were paying. We'll refund you.",
   },
 
-  youreIn: "You're in!",
+  youreIn: "Your tickets are ready",
   showQr: "Show this QR at the door. You'll also find it under “Tickets”.",
   myTicketsBack: "← My tickets",
   notPaid: (s) => `This order isn't paid (${s}).`,
@@ -579,7 +579,7 @@ const en: Dict = {
   noTickets: "No tickets yet",
   noTicketsSub: "When you buy, your QR shows up here.",
   seeEvents: "See events",
-  boughtHere: (i) => `Tickets bought on this phone · ${i}`,
+  boughtHere: (i) => `Tickets bought on this phone (${i})`,
   seeQr: "See QR",
   demoPurchase: "Test purchase (demo mode)",
   loginToSee: "Sign in with your email",
@@ -670,7 +670,7 @@ const en: Dict = {
     hi: (n) => `Hi ${n}, you're in.`,
     showAtDoor: "Show each QR at the door. Each code is valid for one person, one entry.",
     open: "See my tickets",
-    footer: "If you didn't buy these tickets, ignore this email. la nit · lanit.club",
+    footer: "If you didn't buy these tickets, ignore this email. lanit.club",
   },
 
   club: {

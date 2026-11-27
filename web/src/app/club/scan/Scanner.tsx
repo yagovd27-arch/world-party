@@ -23,7 +23,7 @@ export default function Scanner() {
     const r = await scanTicket(code);
     if (r.ok) {
       setCount((c) => c + 1);
-      setResult({ ok: true, title: c.go, sub: `${r.type ?? ""} · ${r.event ?? ""}` });
+      setResult({ ok: true, title: c.go, sub: [r.type, r.event].filter(Boolean).join(", ") });
       navigator.vibrate?.(120);
     } else {
       const when = r.reason === "used" && r.scanned_at ? c.usedAt(new Date(r.scanned_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })) : "";

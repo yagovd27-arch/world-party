@@ -43,7 +43,7 @@ export async function POST(req: Request) {
       mode: "local",
       order: {
         id: crypto.randomUUID(),
-        event: { id: e.id, title: e.title, starts: `${shortDate(e.starts_at, tz, lang)} · ${t.hour(parts(e.starts_at, tz).time)}`, venue: e.club.name, city: city.name },
+        event: { id: e.id, title: e.title, starts: `${shortDate(e.starts_at, tz, lang)}, ${t.hour(parts(e.starts_at, tz).time)}`, venue: e.club.name, city: city.name },
         lines: lines.map((l) => ({ name: l.t!.name, qty: l.qty })),
         codes: lines.flatMap((l) => Array.from({ length: l.qty }, code)),
       },
@@ -109,7 +109,7 @@ export async function POST(req: Request) {
       const s = await createCheckoutSession({
         orderId: order.id, currency, email: buyer.email.trim(), lang,
         lines: [
-          ...lines.map((l) => ({ name: `${event.title} · ${l.t.name}${off(l.t) ? ` (${promo})` : ""}`, qty: l.qty, unit: l.t.price - off(l.t) })),
+          ...lines.map((l) => ({ name: `${event.title}, ${l.t.name}${off(l.t) ? ` (${promo})` : ""}`, qty: l.qty, unit: l.t.price - off(l.t) })),
           ...(fee > 0 ? [{ name: t.serviceFee, qty: 1, unit: fee }] : []),
         ],
         successUrl: `${origin}/api/orders/${order.id}/stripe?k=${order.access_key}`,

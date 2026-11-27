@@ -2,7 +2,7 @@ import LegalPage from "@/components/LegalPage";
 import { LEGAL, legalReady, operator } from "@/lib/legal";
 import { SERVICE_FEE_RATE } from "@/lib/types";
 
-export const metadata = { title: "Terms of use · la nit", robots: { index: legalReady } };
+export const metadata = { title: "Terms of use | la nit", robots: { index: legalReady } };
 
 export default function Terms() {
   const fee = Math.round(SERVICE_FEE_RATE * 100);
