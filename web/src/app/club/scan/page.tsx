@@ -3,7 +3,7 @@ import ClubTop from "../_ui/ClubTop";
 import Scanner from "./Scanner";
 import { getT } from "@/lib/lang";
 
-export const metadata = { title: "la nit for clubs" };
+export const metadata = { title: { absolute: "la nit for clubs" } };
 
 export default async function ScanPage() {
   const { club, admin } = await requireClub();

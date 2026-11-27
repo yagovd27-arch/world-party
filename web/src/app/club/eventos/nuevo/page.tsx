@@ -6,7 +6,7 @@ import EventForm from "../../_ui/EventForm";
 import { cityName } from "@/lib/i18n";
 import { getT } from "@/lib/lang";
 
-export const metadata = { title: "la nit for clubs" };
+export const metadata = { title: { absolute: "la nit for clubs" } };
 
 export default async function NewEvent() {
   const { user, club, admin } = await requireClub();

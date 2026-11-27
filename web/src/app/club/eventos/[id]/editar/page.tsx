@@ -8,7 +8,7 @@ import ClubTop from "../../../_ui/ClubTop";
 import EventForm from "../../../_ui/EventForm";
 import { getT } from "@/lib/lang";
 
-export const metadata = { title: "la nit for clubs" };
+export const metadata = { title: { absolute: "la nit for clubs" } };
 
 type Row = {
   id: string; club_id: string; city_id: string; title: string; description: string | null; lineup: string[]; type: string;

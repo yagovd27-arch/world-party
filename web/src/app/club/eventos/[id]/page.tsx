@@ -10,7 +10,7 @@ import ClubTop from "../../_ui/ClubTop";
 import { getT } from "@/lib/lang";
 import { rankingForClub } from "@/lib/promoters";
 
-export const metadata = { title: "la nit for clubs" };
+export const metadata = { title: { absolute: "la nit for clubs" } };
 
 type Ev = {
   id: string; title: string; starts_at: string; status: string; city_id: string; image_url: string | null;

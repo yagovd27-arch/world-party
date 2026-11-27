@@ -8,7 +8,7 @@ import SubmitButton from "@/components/SubmitButton";
 import ClubTop from "../_ui/ClubTop";
 import { addClubPromoter, createClubPromoterCode, markClubPromoterPaid, removeClubPromoter, setClubPromoterPct } from "../actions";
 
-export const metadata = { title: "PRs | la nit for clubs" };
+export const metadata = { title: "PRs" };
 
 export default async function ClubPrs({ searchParams }: PageProps<"/club/prs">) {
   const sp = await searchParams;
